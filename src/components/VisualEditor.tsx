@@ -1,10 +1,12 @@
 import React, { Component } from 'react';
-import { Button, Modal } from 'antd';
+import { Modal } from 'antd';
 import * as d3 from 'd3';
 import './VisualEditor.css';
 
 interface InternalState {
     showAddModal: boolean;
+    showNodeModal: boolean;
+    selectedNode: any;
     nodes: any[];
     links: any[];
 }
@@ -16,18 +18,23 @@ class VisualEditor extends Component<any, InternalState> {
         super(props);
         this.state = {
             showAddModal: false,
+            showNodeModal: false,
+            selectedNode: {},
             nodes: [
                 { id: 0, name: '创投大厦' },
                 { id: 1, name: '三诺' },
                 { id: 2, name: '36楼' },
                 { id: 3, name: 'SEVEN-ELEVEN' },
                 { id: 4, name: '创茶空间' },
+                { id: 5, name: '驿站2号桩' },
             ],
             links: [
-                { value: 1, source: 0, target: 1 },
-                { value: 2, source: 0, target: 2 },
-                { value: 3, source: 0, target: 3 },
-                { value: 4, source: 1, target: 4 },
+                { value: 1, source: 0, target: 1, relative: 'LINK_TO' },
+                { value: 1, source: 1, target: 0, relative: 'LINK_TO' },
+                { value: 2, source: 0, target: 2, relative: 'REFERENCE' },
+                { value: 3, source: 0, target: 3, relative: 'REFERENCE' },
+                { value: 4, source: 1, target: 4, relative: 'REFERENCE' },
+                { value: 2, source: 0, target: 5, relative: 'REFERENCE' },
             ],
         }
     }
@@ -46,6 +53,7 @@ class VisualEditor extends Component<any, InternalState> {
     
         const width = el.clientWidth;
         const height = el.clientHeight;
+
         this.simulation = d3.forceSimulation(nodes)
             .force("link", d3.forceLink(links).distance(180))
             .force("charge", d3.forceManyBody().strength(-800))
@@ -57,15 +65,15 @@ class VisualEditor extends Component<any, InternalState> {
                     .attr("height", '100%');
 
         this.onZoom(svg);
-        svg.on('dblclick.zoom', null); // 静止双击缩放
 
         this.addArrowMarker(svg);
 
-        const link = this.addLinks(links, svg);
-        const node = this.addNodes(nodes, svg);
-        node.append("title").text((d: any) => d.name);
-        const text = this.addTexts(nodes, svg);
+        const link = this.initLinks(links, svg);
+        const node = this.initNodes(nodes, svg);
+        const nodeText = this.initNodeText(nodes);
+        const linkText = this.initLinkText(links);
 
+        node.append("title").text((d: any) => d.name);
 
         this.simulation.on("tick", () => {
             link
@@ -73,11 +81,21 @@ class VisualEditor extends Component<any, InternalState> {
                 .attr("y1", (d: any) => d.source.y)
                 .attr("x2", (d: any) => d.target.x)
                 .attr("y2", (d: any) => d.target.y);
+
+            linkText
+                .attr('x', (d: any) => (d.source.x + d.target.x) / 2)
+                .attr('y', (d: any) => (d.source.y + d.target.y) / 2);
         
             node
                 .attr("cx", (d: any) => d.x)
                 .attr("cy", (d: any) => d.y);
+
+            nodeText
+                .attr("x", (d: any) => d.x)
+                .attr("y", (d: any) => d.y);
         });
+
+        this.initNodeEvent();
 
         return svg.node();
     }
@@ -105,31 +123,37 @@ class VisualEditor extends Component<any, InternalState> {
 
     onZoom(svg: any) {
         // 鼠标滚轮缩放
-        return svg.call(d3.zoom().on('zoom', () => {
-            svg.selectAll("g").attr('transform', d3.event.transform);
+        svg.call(d3.zoom().on('zoom', () => {
+            d3.selectAll('#Neo4jContainer > svg > g').attr('transform', d3.event.transform);
         }));
+        svg.on('dblclick.zoom', null); // 静止双击缩放
     }
 
-    addLinks(links: any, svg: any) {
-        return svg.append("g")
-            .attr("stroke", "#A5ABB6")
-            .attr("stroke-opacity", 0.8)
+    initLinks(links: any, svg: any) {
+        return svg.append('g')
+            .attr('class', 'layer links')
             .selectAll("line")
             .data(links)
-            .join("line")
+            .join('g')
+            .attr('class', 'link')
+            .append("line")
+            .attr("stroke", "#A5ABB6")
             .attr("stroke-width", 1)
             .attr('marker-end', 'url(#ArrowMarker)');
     }
 
-    addNodes(nodes: any, svg: any) {
+    initNodes(nodes: any, svg: any) {
         return svg.append("g")
-            .attr("stroke", "#E0849B")
-            .attr("stroke-width", 2)
+            .attr('class', 'layer nodes')
             .selectAll("circle")
             .data(nodes)
-            .join("circle")
-            .attr("r", 25)
-            .attr("fill", '#FB95AF')
+            .join('g')
+            .attr('class', 'node')
+            .append('circle')
+            .attr("r", 30)
+            .attr('fill', '#FB95AF')
+            .attr('stroke', '#E0849B')
+            .attr('stroke-width', '2')
             .call(d3.drag()
                 .on("start", (d: any) => this.onDragStarted(d))
                 .on("drag", (d: any) => this.onDragged(d))
@@ -137,24 +161,80 @@ class VisualEditor extends Component<any, InternalState> {
             );
     }
 
-    addTexts(nodes: any, svg: any) {
-        return svg.append('g')
-            .attr('class', 'text-group')
-            .selectAll('text')
+    initNodeEvent() {
+        const self = this;
+        return d3.selectAll('.node')
+            .on('mouseenter', function(d) {
+                const node: any = d3.select(this);
+
+                if (node._groups[0][0].classList.contains('selected')) {
+                    return;
+                }
+
+                node.select('circle')
+                    .attr('stroke-width', '8')
+                    .attr('stroke-opacity', '0.5');
+            })
+            .on('mouseleave', function(d) {
+                const node: any = d3.select(this);
+
+                if (node._groups[0][0].classList.contains('selected')) {
+                    return;
+                }
+
+                node.select('circle')
+                    .attr('stroke-width', '2')
+                    .attr('stroke-opacity', '1');
+            })
+            .on('click', function(d) {
+                const node: any = d3.select(this);
+                const circle = d3.select(this).select('circle');
+
+                if (node._groups[0][0].classList.contains('selected')) {
+                    circle.attr('stroke-width', '2');
+                    node.attr('class', 'node');
+                } else {
+                    circle.attr('stroke-width', '8');
+                    node.attr('class', 'node selected');
+                }
+
+                self.setState({ selectedNode: d });
+            })
+            .on('dblclick', function(d) {
+                self.setState({ showNodeModal: true });
+            });
+    }
+
+    initNodeText(nodes: any) {
+        return d3.selectAll('.node')
             .data(nodes)
-            .join('text')
-            .style('fill', '#fff')
-            .attr('dx', 40)
-            .attr('dy', 40)
-            .attr('font-family', '微软雅黑')
+            .append('text')
+            .attr('dy', '5')
+            .attr('fill', '#ffffff')
+            .attr('pointer-events', 'none')
+            .attr('font-size', '11px')
             .attr('text-anchor', 'middle')
             .text((d: any) => {
-                const l = d.name.length;
-                if(l > 4){
+                if(d.name.length > 4){
 					const name = d.name.slice(0, 4) + '...';
 					return name;
                 }
                 return d.name;
+            });
+    }
+
+    initLinkText(links: any) {
+        return d3.selectAll('.link')
+            .data(links)
+            .append('text')
+            .attr("class", 'link-text')  
+		    .attr('fill', '#A5ABB6')          
+            .attr('font-size', '11px')
+            .attr('text-anchor', 'middle')   
+		    .text((d: any) => {
+                if(d.relative !== ''){
+                    return d.relative;
+                }
             });
     }
 
@@ -173,7 +253,7 @@ class VisualEditor extends Component<any, InternalState> {
     }
 
     addNewNode() {
-        this.setState({ showAddModal: true });
+        this.setState({ showNodeModal: true });
     }
 
     handleOk() {
@@ -181,11 +261,11 @@ class VisualEditor extends Component<any, InternalState> {
     }
 
     handleCancel() {
-        this.setState({ showAddModal: false });
+        this.setState({ showNodeModal: false });
     }
     
     render() {
-        const { showAddModal } = this.state;
+        const { showNodeModal, selectedNode } = this.state;
 
         return (
             <div className="visual-editor">
@@ -195,11 +275,14 @@ class VisualEditor extends Component<any, InternalState> {
                 </div> */}
                 <div className="visual-editor-container" id="Neo4jContainer"></div>
                 <Modal
-                    title="新增节点"
-                    visible={showAddModal}
+                    centered
+                    title="配送点信息"
+                    visible={showNodeModal}
                     onOk={() => this.handleOk()}
                     onCancel={() => this.handleCancel()}
-                />
+                >
+                    <p>{selectedNode.name}</p>
+                </Modal>
             </div>
         );
     }
