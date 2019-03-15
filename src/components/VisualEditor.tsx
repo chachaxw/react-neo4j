@@ -1,12 +1,14 @@
 import React, { Component } from 'react';
-import { Modal } from 'antd';
+import { Modal, Form, Input } from 'antd';
 import * as d3 from 'd3';
 import './VisualEditor.css';
 
 interface InternalState {
     showAddModal: boolean;
     showNodeModal: boolean;
+    showLinkModal: boolean;
     selectedNode: any;
+    selectedLink: any;
     nodes: any[];
     links: any[];
 }
@@ -19,7 +21,9 @@ class VisualEditor extends Component<any, InternalState> {
         this.state = {
             showAddModal: false,
             showNodeModal: false,
+            showLinkModal: false,
             selectedNode: {},
+            selectedLink: {},
             nodes: [
                 { id: 0, name: '创投大厦' },
                 { id: 1, name: '三诺' },
@@ -67,16 +71,16 @@ class VisualEditor extends Component<any, InternalState> {
 
     componentDidMount() {
         const { nodes, links } = this.state;
-        this.initSimulation(nodes, links);
-    }
-
-    initSimulation(nodes: any, links: any) {
         const el = document.getElementById('Neo4jContainer');
 
         if (!el) {
             return;
         }
     
+        this.initSimulation(el, nodes, links);
+    }
+
+    initSimulation(el: any, nodes: any, links: any) {
         const width = el.clientWidth;
         const height = el.clientHeight;
 
@@ -86,44 +90,35 @@ class VisualEditor extends Component<any, InternalState> {
             .force("collide", d3.forceCollide().strength(-60))
             .force("center", d3.forceCenter(width / 2, height / 2));
 
-        const svg = d3.select('#Neo4jContainer').append("svg")
+        const svg = d3.select('#Neo4jContainer')
+                    .append("svg")
                     .attr("width", '100%')
                     .attr("height", '100%');
 
         this.onZoom(svg);
-
         this.addArrowMarker(svg);
 
         const link = this.initLinks(links, svg);
         const node = this.initNodes(nodes, svg);
-        const nodeText = this.initNodeText(nodes);
-        const linkText = this.initLinkText(links);
-
-        node.append("title").text((d: any) => d.name);
 
         this.simulation.on("tick", () => {
-            link
-                .attr("x1", (d: any) => d.source.x)
-                .attr("y1", (d: any) => d.source.y)
-                .attr("x2", (d: any) => d.target.x)
-                .attr("y2", (d: any) => d.target.y);
+            link.selectAll('.outline')
+                .attr('d', (d: any) => {
+                    return 'M' + d.source.x + ', ' + d.source.y + 'A0,0 0 0,1 ' + d.target.x + ' '+ d.target.y;
+                });
 
-            linkText
-                .attr('x', (d: any) => (d.source.x + d.target.x) / 2)
-                .attr('y', (d: any) => (d.source.y + d.target.y) / 2);
+            link.selectAll('.overlay')
+                .attr('d', (d: any) => {
+                    return 'M' + d.source.x + ', ' + d.source.y + 'A0,0 0 0,1 ' + d.target.x + ' '+ d.target.y;
+                });
         
-            node
-                .attr("cx", (d: any) => d.x)
-                .attr("cy", (d: any) => d.y);
-
-            nodeText
-                .attr("x", (d: any) => d.x)
-                .attr("y", (d: any) => d.y);
+            node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
         });
 
         this.initNodeEvent();
+        this.initLinkEvent();
 
-        return svg.node();
+        this.simulation.alpha(1).restart();
     }
 
     onDragStarted(d: any) {
@@ -143,8 +138,6 @@ class VisualEditor extends Component<any, InternalState> {
         if (!d3.event.active) {
             this.simulation.alphaTarget(0);
         }
-        // d.fx = null;
-        // d.fy = null;
     }
 
     onZoom(svg: any) {
@@ -156,26 +149,77 @@ class VisualEditor extends Component<any, InternalState> {
     }
 
     initLinks(links: any, svg: any) {
-        return svg.append('g')
+        const link = svg.append('g')
             .attr('class', 'layer links')
-            .selectAll("line")
+            .selectAll('path.outline')
             .data(links)
-            .join('g')
-            .attr('class', 'link')
-            .append("line")
-            .attr("stroke", "#A5ABB6")
-            .attr("stroke-width", 1)
+            .enter()
+            .append('g')
+            .attr('class', 'link');
+
+        link.append('path')
+            .attr('id', (d: any, i: number) => `linkPath${i}`)
+            .attr('class', 'outline')
+            .attr('stroke', '#A5ABB6')
+            .attr('stroke-width', 1)
             .attr('marker-end', 'url(#ArrowMarker)');
+
+        link.append('text')
+            .attr("class", 'link-text')  
+            .attr('fill', '#A5ABB6')
+            .append('textPath')
+            .attr('pointer-events', 'none')
+            .attr('href', (d: any, i: number) => `#linkPath${i}`)
+            .attr('startOffset', '50%')
+            .attr('font-size', '11px')
+            .attr('text-anchor', 'middle')   
+            .text((d: any) => {
+                if(d.relative !== ''){
+                    return d.relative;
+                }
+            });
+        
+        link.append('path')
+            .attr('class', 'overlay')
+            .attr('stroke', '#68bdf6')
+            .attr('stroke-opacity', '0.5')
+            .attr('stroke-width', '12')
+            .style('display', 'none');
+
+        return link;
+    }
+
+    initLinkEvent() {
+        const self = this;
+        return d3.selectAll('.link .outline')
+            .on('mouseenter', function(d: any) {
+                const node: any = d3.select(this);
+                node.select('.overlay')
+                    .style('display', 'block');
+            })
+            .on('mouseleave', function(d: any) {
+                const node: any = d3.select(this);
+                node.select('.overlay')
+                    .style('display', 'none');
+            })
+            .on('click', function(d: any) {
+                self.setState({ selectedLink: d });
+            })
+            .on('dblclick', function(d: any) {
+                self.setState({ showLinkModal: true });
+            });
     }
 
     initNodes(nodes: any, svg: any) {
-        return svg.append("g")
+        const node = svg.append("g")
             .attr('class', 'layer nodes')
-            .selectAll("circle")
+            .selectAll('.node')
             .data(nodes)
-            .join('g')
-            .attr('class', 'node')
-            .append('circle')
+            .enter()
+            .append('g')
+            .attr('class', 'node');
+
+        node.append('circle')
             .attr("r", 30)
             .attr('fill', '#FB95AF')
             .attr('stroke', '#E0849B')
@@ -185,6 +229,24 @@ class VisualEditor extends Component<any, InternalState> {
                 .on("drag", (d: any) => this.onDragged(d))
                 .on("end", (d: any) => this.onDragEnded(d))
             );
+
+        node.append('text')
+            .attr('dy', '5')
+            .attr('fill', '#ffffff')
+            .attr('pointer-events', 'none')
+            .attr('font-size', '11px')
+            .attr('text-anchor', 'middle')
+            .text((d: any) => {
+                if(d.name.length > 4){
+                    const name = d.name.slice(0, 4) + '...';
+                    return name;
+                }
+                return d.name;
+            });
+
+        node.append("title").text((d: any) => d.name);
+
+        return node;
     }
 
     initNodeEvent() {
@@ -198,7 +260,8 @@ class VisualEditor extends Component<any, InternalState> {
                 }
 
                 node.select('circle')
-                    .attr('stroke-width', '8')
+                    .attr('stroke', '#FB95AF')
+                    .attr('stroke-width', '12')
                     .attr('stroke-opacity', '0.5');
             })
             .on('mouseleave', function(d) {
@@ -209,18 +272,21 @@ class VisualEditor extends Component<any, InternalState> {
                 }
 
                 node.select('circle')
+                    .attr('stroke', '#E0849B')
                     .attr('stroke-width', '2')
                     .attr('stroke-opacity', '1');
             })
             .on('click', function(d) {
                 const node: any = d3.select(this);
-                const circle = d3.select(this).select('circle');
+                const circle = node.select('circle');
 
                 if (node._groups[0][0].classList.contains('selected')) {
-                    circle.attr('stroke-width', '2');
+                    circle.attr('stroke-width', '2')
+                        .attr('stroke', '#E0849B');
                     node.attr('class', 'node');
                 } else {
-                    circle.attr('stroke-width', '8');
+                    circle.attr('stroke-width', '12')
+                        .attr('stroke', '#FB95AF');
                     node.attr('class', 'node selected');
                 }
 
@@ -228,24 +294,6 @@ class VisualEditor extends Component<any, InternalState> {
             })
             .on('dblclick', function(d) {
                 self.setState({ showNodeModal: true });
-            });
-    }
-
-    initNodeText(nodes: any) {
-        return d3.selectAll('.node')
-            .data(nodes)
-            .append('text')
-            .attr('dy', '5')
-            .attr('fill', '#ffffff')
-            .attr('pointer-events', 'none')
-            .attr('font-size', '11px')
-            .attr('text-anchor', 'middle')
-            .text((d: any) => {
-                if(d.name.length > 4){
-					const name = d.name.slice(0, 4) + '...';
-					return name;
-                }
-                return d.name;
             });
     }
 
@@ -282,16 +330,35 @@ class VisualEditor extends Component<any, InternalState> {
         this.setState({ showNodeModal: true });
     }
 
-    handleOk() {
+    handleNodeOk() {
         console.log('Ok');
     }
 
-    handleCancel() {
+    handleNodeCancel() {
+        this.setState({ showNodeModal: false });
+    }
+
+    handleLinkOk() {
+        console.log('Ok');
+    }
+
+    handleLinkChange(e: any) {
+        const value = e.target.value;
+        const { selectedLink } = this.state;
+        this.setState({
+            selectedLink: {
+                ...selectedLink,
+                relative: value,
+            },
+        });
+    }
+
+    handleLinkCancel() {
         this.setState({ showNodeModal: false });
     }
     
     render() {
-        const { showNodeModal, selectedNode } = this.state;
+        const { showNodeModal, showLinkModal, selectedNode, selectedLink } = this.state;
 
         return (
             <div className="visual-editor">
@@ -304,10 +371,23 @@ class VisualEditor extends Component<any, InternalState> {
                     centered
                     title="配送点信息"
                     visible={showNodeModal}
-                    onOk={() => this.handleOk()}
-                    onCancel={() => this.handleCancel()}
+                    onOk={() => this.handleNodeOk()}
+                    onCancel={() => this.handleNodeCancel()}
                 >
                     <p>{selectedNode.name}</p>
+                </Modal>
+                <Modal
+                    centered
+                    title="编辑配送点关系"
+                    visible={showLinkModal}
+                    onOk={() => this.handleLinkOk()}
+                    onCancel={() => this.handleLinkCancel()}
+                >
+                    <Form>
+                        <Form.Item label="配送点">
+                            <Input required value={selectedLink.relative} onChange={(e: any) => this.handleLinkChange(e)} />
+                        </Form.Item>
+                    </Form>
                 </Modal>
             </div>
         );
