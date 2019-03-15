@@ -56,9 +56,10 @@ class VisualEditor extends Component<any, InternalState> {
                 { value: 2, source: 0, target: 7, relative: 'REFERENCE' },
                 { value: 2, source: 0, target: 8, relative: 'REFERENCE' },
                 { value: 2, source: 0, target: 9, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 10, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 11, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 12, relative: 'REFERENCE' },
+                { value: 2, source: 9, target: 10, relative: 'REFERENCE' },
+                { value: 2, source: 10, target: 11, relative: 'REFERENCE' },
+                { value: 2, source: 11, target: 9, relative: 'REFERENCE' },
+                { value: 1, source: 1, target: 12, relative: 'REFERENCE' },
                 { value: 1, source: 1, target: 13, relative: 'REFERENCE' },
                 { value: 1, source: 1, target: 14, relative: 'REFERENCE' },
                 { value: 1, source: 1, target: 15, relative: 'REFERENCE' },
@@ -217,18 +218,18 @@ class VisualEditor extends Component<any, InternalState> {
             .data(nodes)
             .enter()
             .append('g')
-            .attr('class', 'node');
+            .attr('class', 'node')
+            .call(d3.drag()
+                .on("start", (d) => this.onDragStarted(d))
+                .on("drag", (d) => this.onDragged(d))
+                .on("end", (d) => this.onDragEnded(d))
+            );
 
         node.append('circle')
             .attr("r", 30)
             .attr('fill', '#FB95AF')
             .attr('stroke', '#E0849B')
-            .attr('stroke-width', '2')
-            .call(d3.drag()
-                .on("start", (d: any) => this.onDragStarted(d))
-                .on("drag", (d: any) => this.onDragged(d))
-                .on("end", (d: any) => this.onDragEnded(d))
-            );
+            .attr('stroke-width', '2');
 
         node.append('text')
             .attr('dy', '5')
@@ -374,7 +375,11 @@ class VisualEditor extends Component<any, InternalState> {
                     onOk={() => this.handleNodeOk()}
                     onCancel={() => this.handleNodeCancel()}
                 >
-                    <p>{selectedNode.name}</p>
+                    <Form>
+                        <Form.Item label="配送点">
+                            <Input required value={selectedNode.name} onChange={(e: any) => this.handleLinkChange(e)} />
+                        </Form.Item>
+                    </Form>
                 </Modal>
                 <Modal
                     centered
