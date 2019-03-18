@@ -192,23 +192,40 @@ class VisualEditor extends Component<any, InternalState> {
 
     initLinkEvent() {
         const self = this;
-        return d3.selectAll('.link .outline')
-            .on('mouseenter', function(d: any) {
-                const node: any = d3.select(this);
-                node.select('.overlay')
-                    .style('display', 'block');
-            })
-            .on('mouseleave', function(d: any) {
-                const node: any = d3.select(this);
-                node.select('.overlay')
+        const link = d3.selectAll('.link');
+
+        link.on('mouseenter', function(d: any) {
+            const link: any = d3.select(this);
+            link.select('.overlay')
+                .style('display', 'block');
+        });
+
+        link.on('mouseleave', function(d: any) {
+            const link: any = d3.select(this);
+
+            if (!link._groups[0][0].classList.contains('selected')) {
+                link.select('.overlay')
                     .style('display', 'none');
-            })
-            .on('click', function(d: any) {
-                self.setState({ selectedLink: d });
-            })
-            .on('dblclick', function(d: any) {
-                self.setState({ showLinkModal: true });
-            });
+            }
+        });
+
+        linkn.on('click', function(d: any) {
+            const link: any = d3.select(this);
+
+            if (link._groups[0][0].classList.contains('selected')) {
+                link.attr('class', 'link');
+            } else {
+                link.attr('class', 'link selected');
+                link.select('.overlay')
+                    .style('display', 'block');
+            }
+
+            self.setState({ selectedLink: d });
+        });
+
+        link.on('dblclick', function(d: any) {
+            self.setState({ showLinkModal: true });
+        });
     }
 
     initNodes(nodes: any, svg: any) {
@@ -252,50 +269,54 @@ class VisualEditor extends Component<any, InternalState> {
 
     initNodeEvent() {
         const self = this;
-        return d3.selectAll('.node')
-            .on('mouseenter', function(d) {
-                const node: any = d3.select(this);
+        const node = d3.selectAll('.node');
 
-                if (node._groups[0][0].classList.contains('selected')) {
-                    return;
-                }
+        node.on('mouseenter', function(d) {
+            const node: any = d3.select(this);
 
-                node.select('circle')
-                    .attr('stroke', '#FB95AF')
-                    .attr('stroke-width', '12')
-                    .attr('stroke-opacity', '0.5');
-            })
-            .on('mouseleave', function(d) {
-                const node: any = d3.select(this);
+            if (node._groups[0][0].classList.contains('selected')) {
+                return;
+            }
 
-                if (node._groups[0][0].classList.contains('selected')) {
-                    return;
-                }
+            node.select('circle')
+                .attr('stroke', '#FB95AF')
+                .attr('stroke-width', '12')
+                .attr('stroke-opacity', '0.5');
+        });
 
-                node.select('circle')
-                    .attr('stroke', '#E0849B')
-                    .attr('stroke-width', '2')
-                    .attr('stroke-opacity', '1');
-            })
-            .on('click', function(d) {
-                const node: any = d3.select(this);
-                const circle = node.select('circle');
+        node.on('mouseleave', function(d) {
+            const node: any = d3.select(this);
 
-                if (node._groups[0][0].classList.contains('selected')) {
-                    circle.attr('stroke-width', '2')
-                        .attr('stroke', '#E0849B');
-                    node.attr('class', 'node');
-                } else {
-                    circle.attr('stroke-width', '12')
-                        .attr('stroke', '#FB95AF');
-                    node.attr('class', 'node selected');
-                }
+            if (node._groups[0][0].classList.contains('selected')) {
+                return;
+            }
 
-                self.setState({ selectedNode: d });
-            })
-            .on('dblclick', function(d) {
-                self.setState({ showNodeModal: true });
-            });
+            node.select('circle')
+                .attr('stroke', '#E0849B')
+                .attr('stroke-width', '2')
+                .attr('stroke-opacity', '1');
+        });
+
+        node.on('click', function(d) {
+            const node: any = d3.select(this);
+            const circle = node.select('circle');
+
+            if (node._groups[0][0].classList.contains('selected')) {
+                circle.attr('stroke-width', '2')
+                    .attr('stroke', '#E0849B');
+                node.attr('class', 'node');
+            } else {
+                circle.attr('stroke-width', '12')
+                    .attr('stroke', '#FB95AF');
+                node.attr('class', 'node selected');
+            }
+
+            self.setState({ selectedNode: d });
+        });
+
+        node.on('dblclick', function(d) {
+            self.setState({ showNodeModal: true });
+        });
     }
 
     initLinkText(links: any) {
