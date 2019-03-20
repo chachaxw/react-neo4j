@@ -3,6 +3,10 @@ import { Modal, Form, Input } from 'antd';
 import * as d3 from 'd3';
 import './VisualEditor.css';
 
+import NodeModal from './NodeModal';
+import LinkModal from './LinkModal';
+import { nodes, links } from '../mock/';
+
 interface InternalState {
     showAddModal: boolean;
     showNodeModal: boolean;
@@ -14,410 +18,462 @@ interface InternalState {
 }
 
 class VisualEditor extends Component<any, InternalState> {
-    simulation: any = null;
+	simulation: any = null;
 
-    constructor(props: any) {
-        super(props);
-        this.state = {
-            showAddModal: false,
-            showNodeModal: false,
-            showLinkModal: false,
-            selectedNode: {},
-            selectedLink: {},
-            nodes: [
-                { id: 0, name: '创投大厦' },
-                { id: 1, name: '三诺' },
-                { id: 2, name: '36楼' },
-                { id: 3, name: 'SEVEN-ELEVEN' },
-                { id: 4, name: '创茶空间' },
-                { id: 5, name: '驿站1号桩' },
-                { id: 6, name: '驿站2号桩' },
-                { id: 7, name: '驿站3号桩' },
-                { id: 8, name: '驿站4号桩' },
-                { id: 9, name: '驿站5号桩' },
-                { id: 10, name: '驿站6号桩' },
-                { id: 11, name: '驿站7号桩' },
-                { id: 12, name: '驿站8号桩' },
-                { id: 13, name: '驿站9号桩' },
-                { id: 14, name: '驿站10号桩' },
-                { id: 15, name: '驿站11号桩' },
-                { id: 16, name: '驿站12号桩' },
-                { id: 17, name: '驿站13号桩' },
-                { id: 18, name: '驿站14号桩' },
-            ],
-            links: [
-                { value: 1, source: 0, target: 1, relative: 'LINK_TO' },
-                { value: 1, source: 1, target: 0, relative: 'LINK_TO' },
-                { value: 2, source: 0, target: 2, relative: 'REFERENCE' },
-                { value: 3, source: 0, target: 3, relative: 'REFERENCE' },
-                { value: 4, source: 1, target: 4, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 5, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 6, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 7, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 8, relative: 'REFERENCE' },
-                { value: 2, source: 0, target: 9, relative: 'REFERENCE' },
-                { value: 2, source: 9, target: 10, relative: 'REFERENCE' },
-                { value: 2, source: 10, target: 11, relative: 'REFERENCE' },
-                { value: 2, source: 11, target: 9, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 12, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 13, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 14, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 15, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 16, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 17, relative: 'REFERENCE' },
-                { value: 1, source: 1, target: 18, relative: 'REFERENCE' },
-            ],
-        }
-    }
+	constructor(props: any) {
+		super(props);
 
-    componentDidMount() {
-        const { nodes, links } = this.state;
-        const el = document.getElementById('Neo4jContainer');
+		this.state = {
+			showAddModal: false,
+			showNodeModal: false,
+			showLinkModal: false,
+			selectedNode: {},
+			selectedLink: {},
+			nodes: nodes,
+			links: links,
+		}
+	}
 
-        if (!el) {
-            return;
-        }
-    
-        this.initSimulation(el, nodes, links);
-    }
+	componentDidMount() {
+		const { nodes, links } = this.state;
+		const el = document.getElementById('Neo4jContainer');
 
-    initSimulation(el: any, nodes: any, links: any) {
-        const width = el.clientWidth;
-        const height = el.clientHeight;
+		if (!el) {
+			return;
+		}
 
-        this.simulation = d3.forceSimulation(nodes)
-            .force("link", d3.forceLink(links).distance(180))
-            .force("charge", d3.forceManyBody().strength(-800))
-            .force("collide", d3.forceCollide().strength(-60))
-            .force("center", d3.forceCenter(width / 2, height / 2));
+		this.initSimulation(el, nodes, links);
+	}
 
-        const svg = d3.select('#Neo4jContainer')
-                    .append("svg")
-                    .attr("width", '100%')
-                    .attr("height", '100%');
+	initSimulation(el: any, nodes: any, links: any) {
+		const width = el.clientWidth;
+		const height = el.clientHeight;
 
-        this.onZoom(svg);
-        this.addArrowMarker(svg);
+		this.simulation = d3.forceSimulation(nodes)
+			.force("link", d3.forceLink(links).distance(180))
+			.force("charge", d3.forceManyBody().strength(-800))
+			.force("collide", d3.forceCollide().strength(-60))
+			.force("center", d3.forceCenter(width / 2, height / 2));
 
-        const link = this.initLinks(links, svg);
-        const node = this.initNodes(nodes, svg);
+		const svg = d3.select('#Neo4jContainer')
+			.append("svg")
+			.attr("width", '100%')
+			.attr("height", '100%');
 
-        this.simulation.on("tick", () => {
-            link.selectAll('.outline')
-                .attr('d', (d: any) => {
-                    return 'M' + d.source.x + ', ' + d.source.y + 'A0,0 0 0,1 ' + d.target.x + ' '+ d.target.y;
-                });
+		this.onZoom(svg);
+		this.addArrowMarker(svg);
 
-            link.selectAll('.overlay')
-                .attr('d', (d: any) => {
-                    return 'M' + d.source.x + ', ' + d.source.y + 'A0,0 0 0,1 ' + d.target.x + ' '+ d.target.y;
-                });
-        
-            node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
-        });
+		const link = this.initLinks(links, svg);
+		const node = this.initNodes(nodes, svg);
 
-        this.initNodeEvent();
-        this.initLinkEvent();
+		this.simulation.on("tick", () => {
+			link.selectAll('.outline')
+				.attr('d', (d: any) => {
+					return 'M' + d.source.x + ', ' + d.source.y + 'A0,0 0 0,1 ' + d.target.x + ' '+ d.target.y;
+				});
 
-        this.simulation.alpha(1).restart();
-    }
+			link.selectAll('.overlay')
+				.attr('d', (d: any) => {
+					return 'M' + d.source.x + ', ' + d.source.y + 'A0,0 0 0,1 ' + d.target.x + ' '+ d.target.y;
+				});
+	
+			node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
+		});
 
-    onDragStarted(d: any) {
-        if (!d3.event.active) {
-            this.simulation.alphaTarget(0.3).restart();
-        }
-        d.fx = d.x;
-        d.fy = d.y;
-    }
+		this.initNodeEvent();
+		this.initLinkEvent();
 
-    onDragged(d: any) {
-        d.fx = d3.event.x;
-        d.fy = d3.event.y;
-    }
+		this.simulation.alpha(1).restart();
+	}
 
-    onDragEnded(d: any) {
-        if (!d3.event.active) {
-            this.simulation.alphaTarget(0);
-        }
-    }
+	onDragStarted(d: any) {
+		if (!d3.event.active) {
+			this.simulation.alphaTarget(0.3).restart();
+		}
+		d.fx = d.x;
+		d.fy = d.y;
+	}
 
-    onZoom(svg: any) {
-        // 鼠标滚轮缩放
-        svg.call(d3.zoom().on('zoom', () => {
-            d3.selectAll('#Neo4jContainer > svg > g').attr('transform', d3.event.transform);
-        }));
-        svg.on('dblclick.zoom', null); // 静止双击缩放
-    }
+	onDragged(d: any) {
+		d.fx = d3.event.x;
+		d.fy = d3.event.y;
+	}
 
-    initLinks(links: any, svg: any) {
-        const link = svg.append('g')
-            .attr('class', 'layer links')
-            .selectAll('path.outline')
-            .data(links)
-            .enter()
-            .append('g')
-            .attr('class', 'link');
+	onDragEnded(d: any) {
+		if (!d3.event.active) {
+			this.simulation.alphaTarget(0);
+		}
+	}
 
-        link.append('path')
-            .attr('id', (d: any, i: number) => `linkPath${i}`)
-            .attr('class', 'outline')
-            .attr('stroke', '#A5ABB6')
-            .attr('stroke-width', 1)
-            .attr('marker-end', 'url(#ArrowMarker)');
+	onZoom(svg: any) {
+		// 鼠标滚轮缩放
+		svg.call(d3.zoom().on('zoom', () => {
+			d3.selectAll('#Neo4jContainer > svg > g').attr('transform', d3.event.transform);
+		}));
+		svg.on('dblclick.zoom', null); // 静止双击缩放
+	}
 
-        link.append('text')
-            .attr("class", 'link-text')  
-            .attr('fill', '#A5ABB6')
-            .append('textPath')
-            .attr('pointer-events', 'none')
-            .attr('href', (d: any, i: number) => `#linkPath${i}`)
-            .attr('startOffset', '50%')
-            .attr('font-size', '11px')
-            .attr('text-anchor', 'middle')   
-            .text((d: any) => {
-                if(d.relative !== ''){
-                    return d.relative;
-                }
-            });
-        
-        link.append('path')
-            .attr('class', 'overlay')
-            .attr('stroke', '#68bdf6')
-            .attr('stroke-opacity', '0.5')
-            .attr('stroke-width', '12')
-            .style('display', 'none');
+	initLinks(links: any, svg: any) {
+		const link = svg.append('g')
+			.attr('class', 'layer links')
+			.selectAll('path.outline')
+			.data(links)
+			.enter()
+			.append('g')
+			.attr('class', 'link');
 
-        return link;
-    }
+		link.append('path')
+			.attr('id', (d: any, i: number) => `linkPath${i}`)
+			.attr('class', 'outline')
+			.attr('stroke', '#A5ABB6')
+			.attr('stroke-width', 1)
+			.attr('marker-end', 'url(#ArrowMarker)');
 
-    initLinkEvent() {
-        const self = this;
-        const link = d3.selectAll('.link');
+		link.append('text')
+			.attr("class", 'link-text')  
+			.attr('fill', '#A5ABB6')
+			.append('textPath')
+			.attr('pointer-events', 'none')
+			.attr('href', (d: any, i: number) => `#linkPath${i}`)
+			.attr('startOffset', '50%')
+			.attr('font-size', '11px')
+			.attr('text-anchor', 'middle')   
+			.text((d: any) => {
+					if(d.relative !== ''){
+							return d.relative;
+					}
+			});
+		
+		link.append('path')
+			.attr('class', 'overlay')
+			.attr('stroke', '#68bdf6')
+			.attr('stroke-opacity', '0.5')
+			.attr('stroke-width', '12')
+			.style('display', 'none');
 
-        link.on('mouseenter', function(d: any) {
-            const link: any = d3.select(this);
-            link.select('.overlay')
-                .style('display', 'block');
-        });
+		return link;
+	}
 
-        link.on('mouseleave', function(d: any) {
-            const link: any = d3.select(this);
+	initLinkEvent() {
+		const self = this;
+		const link = d3.selectAll('.link');
 
-            if (!link._groups[0][0].classList.contains('selected')) {
-                link.select('.overlay')
-                    .style('display', 'none');
-            }
-        });
+		link.on('mouseenter', function(d: any) {
+			const link: any = d3.select(this);
+			link.select('.overlay')
+				.style('display', 'block');
+		});
 
-        linkn.on('click', function(d: any) {
-            const link: any = d3.select(this);
+		link.on('mouseleave', function(d: any) {
+			const link: any = d3.select(this);
 
-            if (link._groups[0][0].classList.contains('selected')) {
-                link.attr('class', 'link');
-            } else {
-                link.attr('class', 'link selected');
-                link.select('.overlay')
-                    .style('display', 'block');
-            }
+			if (!link._groups[0][0].classList.contains('selected')) {
+				link.select('.overlay')
+					.style('display', 'none');
+			}
+		});
 
-            self.setState({ selectedLink: d });
-        });
+		link.on('click', function(d: any) {
+			const link: any = d3.select(this);
 
-        link.on('dblclick', function(d: any) {
-            self.setState({ showLinkModal: true });
-        });
-    }
+			if (link._groups[0][0].classList.contains('selected')) {
+				link.attr('class', 'link');
+			} else {
+				link.attr('class', 'link selected');
+				link.select('.overlay')
+					.style('display', 'block');
+			}
 
-    initNodes(nodes: any, svg: any) {
-        const node = svg.append("g")
-            .attr('class', 'layer nodes')
-            .selectAll('.node')
-            .data(nodes)
-            .enter()
-            .append('g')
-            .attr('class', 'node')
-            .call(d3.drag()
-                .on("start", (d) => this.onDragStarted(d))
-                .on("drag", (d) => this.onDragged(d))
-                .on("end", (d) => this.onDragEnded(d))
-            );
+			self.setState({ selectedLink: d });
+		});
 
-        node.append('circle')
-            .attr("r", 30)
-            .attr('fill', '#FB95AF')
-            .attr('stroke', '#E0849B')
-            .attr('stroke-width', '2');
+		link.on('dblclick', function(d: any) {
+			self.setState({ showLinkModal: true });
+		});
+	}
 
-        node.append('text')
-            .attr('dy', '5')
-            .attr('fill', '#ffffff')
-            .attr('pointer-events', 'none')
-            .attr('font-size', '11px')
-            .attr('text-anchor', 'middle')
-            .text((d: any) => {
-                if(d.name.length > 4){
-                    const name = d.name.slice(0, 4) + '...';
-                    return name;
-                }
-                return d.name;
-            });
+	linkArc(d: any) {
+		const dx = (d.target.x - d.source.x);
+		const dy = (d.target.y - d.source.y);
+		const dr = Math.sqrt(dx * dx + dy * dy);
+		const unevenCorrection = d.sameUneven ? 0 : 0.5;
+		const curvature = 2;
+		let arc = (1.0 / curvature) * ((dr * d.maxSameHalf) / (d.sameIndexCorrected - unevenCorrection));
 
-        node.append("title").text((d: any) => d.name);
+		if (d.sameMiddleLink) {
+			arc = 0;
+		}
 
-        return node;
-    }
+		return `M${d.source.x},${d.source.y}A${arc},${arc} 0 0,${d.sameArcDirection} ${d.target.x},${d.target.y}`;
+	}
 
-    initNodeEvent() {
-        const self = this;
-        const node = d3.selectAll('.node');
+	initNodes(nodes: any, svg: any) {
+		const node = svg.append("g")
+			.attr('class', 'layer nodes')
+			.selectAll('.node')
+			.data(nodes)
+			.enter()
+			.append('g')
+			.attr('class', 'node')
+			.call(d3.drag()
+				.on("start", (d) => this.onDragStarted(d))
+				.on("drag", (d) => this.onDragged(d))
+				.on("end", (d) => this.onDragEnded(d))
+			);
 
-        node.on('mouseenter', function(d) {
-            const node: any = d3.select(this);
+		node.append('circle')
+			.attr("r", 30)
+			.attr('fill', '#FB95AF')
+			.attr('stroke', '#E0849B')
+			.attr('stroke-width', '2');
 
-            if (node._groups[0][0].classList.contains('selected')) {
-                return;
-            }
+		node.append('text')
+			.attr('dy', '5')
+			.attr('fill', '#ffffff')
+			.attr('pointer-events', 'none')
+			.attr('font-size', '11px')
+			.attr('text-anchor', 'middle')
+			.text((d: any) => {
+				if(d.name.length > 4){
+					const name = d.name.slice(0, 4) + '...';
+					return name;
+				}
+				return d.name;
+			});
 
-            node.select('circle')
-                .attr('stroke', '#FB95AF')
-                .attr('stroke-width', '12')
-                .attr('stroke-opacity', '0.5');
-        });
+		node.append("title").text((d: any) => d.name);
 
-        node.on('mouseleave', function(d) {
-            const node: any = d3.select(this);
+		return node;
+	}
 
-            if (node._groups[0][0].classList.contains('selected')) {
-                return;
-            }
+	initNodeEvent() {
+		const self = this;
+		const node = d3.selectAll('.node');
 
-            node.select('circle')
-                .attr('stroke', '#E0849B')
-                .attr('stroke-width', '2')
-                .attr('stroke-opacity', '1');
-        });
+		node.on('mouseenter', function(d) {
+			const node: any = d3.select(this);
 
-        node.on('click', function(d) {
-            const node: any = d3.select(this);
-            const circle = node.select('circle');
+			if (node._groups[0][0].classList.contains('selected')) {
+				return;
+			}
 
-            if (node._groups[0][0].classList.contains('selected')) {
-                circle.attr('stroke-width', '2')
-                    .attr('stroke', '#E0849B');
-                node.attr('class', 'node');
-            } else {
-                circle.attr('stroke-width', '12')
-                    .attr('stroke', '#FB95AF');
-                node.attr('class', 'node selected');
-            }
+			node.select('circle')
+				.attr('stroke', '#FB95AF')
+				.attr('stroke-width', '12')
+				.attr('stroke-opacity', '0.5');
+		});
 
-            self.setState({ selectedNode: d });
-        });
+		node.on('mouseleave', function(d) {
+			const node: any = d3.select(this);
 
-        node.on('dblclick', function(d) {
-            self.setState({ showNodeModal: true });
-        });
-    }
+			if (node._groups[0][0].classList.contains('selected')) {
+				return;
+			}
 
-    initLinkText(links: any) {
-        return d3.selectAll('.link')
-            .data(links)
-            .append('text')
-            .attr("class", 'link-text')  
-		    .attr('fill', '#A5ABB6')          
-            .attr('font-size', '11px')
-            .attr('text-anchor', 'middle')   
-		    .text((d: any) => {
-                if(d.relative !== ''){
-                    return d.relative;
-                }
-            });
-    }
+			node.select('circle')
+				.attr('stroke', '#E0849B')
+				.attr('stroke-width', '2')
+				.attr('stroke-opacity', '1');
+		});
 
-    addArrowMarker(svg: any) {
-        const arrow = svg.append('marker')
-            .attr('id', 'ArrowMarker')
-            .attr('markerUnits', 'strokeWidth')
-            .attr('markerWidth', '18')
-            .attr('markerHeight', '18')
-            .attr('viewBox', '0 0 12 12')
-            .attr('refX', '28')
-            .attr('refY', '6')
-            .attr('orient', 'auto');
-        const arrowPath = 'M2,2 L10,6 L2,10 L6,6 L2,2';
-        arrow.append('path').attr('d', arrowPath).attr('fill', '#A5ABB6');
-    }
+		node.on('click', function(d) {
+			const node: any = d3.select(this);
+			const circle = node.select('circle');
 
-    addNewNode() {
-        this.setState({ showNodeModal: true });
-    }
+			if (node._groups[0][0].classList.contains('selected')) {
+				circle.attr('stroke-width', '2')
+					.attr('stroke', '#E0849B');
+				node.attr('class', 'node');
+			} else {
+				circle.attr('stroke-width', '12')
+					.attr('stroke', '#FB95AF');
+				node.attr('class', 'node selected');
+			}
 
-    handleNodeOk() {
-        console.log('Ok');
-    }
+			self.setState({ selectedNode: d });
+		});
 
-    handleNodeCancel() {
-        this.setState({ showNodeModal: false });
-    }
+		node.on('dblclick', function(d) {
+			self.setState({ showNodeModal: true });
+		});
+	}
 
-    handleLinkOk() {
-        console.log('Ok');
-    }
+	initLinkText(links: any) {
+		return d3.selectAll('.link')
+			.data(links)
+			.append('text')
+			.attr("class", 'link-text')  
+			.attr('fill', '#A5ABB6')          
+			.attr('font-size', '11px')
+			.attr('text-anchor', 'middle')   
+			.text((d: any) => {
+				if(d.relative !== ''){
+					return d.relative;
+				}
+			});
+	}
 
-    handleLinkChange(e: any) {
-        const value = e.target.value;
-        const { selectedLink } = this.state;
-        this.setState({
-            selectedLink: {
-                ...selectedLink,
-                relative: value,
-            },
-        });
-    }
+	addArrowMarker(svg: any) {
+		const arrow = svg.append('marker')
+			.attr('id', 'ArrowMarker')
+			.attr('markerUnits', 'strokeWidth')
+			.attr('markerWidth', '18')
+			.attr('markerHeight', '18')
+			.attr('viewBox', '0 0 12 12')
+			.attr('refX', '28')
+			.attr('refY', '6')
+			.attr('orient', 'auto');
 
-    handleLinkCancel() {
-        this.setState({ showNodeModal: false });
-    }
-    
-    render() {
-        const { showNodeModal, showLinkModal, selectedNode, selectedLink } = this.state;
+		const arrowPath = 'M2,2 L10,6 L2,10 L6,6 L2,2';
+		arrow.append('path').attr('d', arrowPath).attr('fill', '#A5ABB6');
+	}
 
-        return (
-            <div className="visual-editor">
-                {/* <div className="visual-editor-tools">
-                    <Button onClick={() => this.addNewNode()} size="large"
-                        shape="circle" icon="plus-circle"></Button>
-                </div> */}
-                <div className="visual-editor-container" id="Neo4jContainer"></div>
-                <Modal
-                    centered
-                    title="配送点信息"
-                    visible={showNodeModal}
-                    onOk={() => this.handleNodeOk()}
-                    onCancel={() => this.handleNodeCancel()}
-                >
-                    <Form>
-                        <Form.Item label="配送点">
-                            <Input required value={selectedNode.name} onChange={(e: any) => this.handleLinkChange(e)} />
-                        </Form.Item>
-                    </Form>
-                </Modal>
-                <Modal
-                    centered
-                    title="编辑配送点关系"
-                    visible={showLinkModal}
-                    onOk={() => this.handleLinkOk()}
-                    onCancel={() => this.handleLinkCancel()}
-                >
-                    <Form>
-                        <Form.Item label="配送点">
-                            <Input required value={selectedLink.relative} onChange={(e: any) => this.handleLinkChange(e)} />
-                        </Form.Item>
-                    </Form>
-                </Modal>
-            </div>
-        );
-    }
+	initButtonGroup() {
+		const data = [1, 1, 1, 1, 1];
+		const buttonGroup = d3.select('.node.selected').append('g')
+			.attr('id', 'buttonGroup');
+		
+		const pieData = d3.pie()(data);
+		const arcButton = d3.arc().innerRadius(32).outerRadius(64);
+		const arcText = d3.arc().innerRadius(32).outerRadius(60);
+
+		buttonGroup.selectAll('.button')
+			.data(pieData)
+			.enter()
+			.append('path')
+			.attr('class', (d, i) => `button action-${i}`)
+			.attr('d', (d: any) => arcButton(d))
+			.attr('fill', '#D2D5DA')
+			.style('cursor', 'pointer')
+			.attr('stroke', '#f2f2f2')
+			.attr('stroke-width', 2)
+			.attr('stroke-opacity', 0.7);
+
+		buttonGroup.selectAll('.text')
+			.data(pieData)
+			.enter()
+			.append('text')
+			.attr('class', 'text')
+			.attr('transform', (d) => `translate(${arcText.centroid(d)})`)
+			.attr('text-anchor', 'middle')
+			.attr('fill', '#A5ABB6')
+			.attr('pointer-events', 'none')
+			.attr('font-size', 11)
+			.text(function(d, i) {
+				const actions = ['编辑', '展开', '追加', '连线', '删除'];
+				return actions[i];
+			});
+
+		this.initButtonActions();
+
+		return buttonGroup;
+	}
+
+	initButtonActions() {
+		const buttonGroup = d3.select('#buttonGroup');
+		buttonGroup.select('.button.action-0')
+			.on('click', (d) => {
+				console.log('Edit', d);
+			});
+
+		buttonGroup.select('.button.action-1')
+			.on('click', (d) => {
+				console.log('Expand', d);
+			});
+
+		buttonGroup.select('.button.action-2')
+			.on('click', (d) => {
+				console.log('Add', d);
+			});
+
+		buttonGroup.select('.button.action-3')
+			.on('click', (d) => {
+				console.log('Link', d);
+			});
+
+		buttonGroup.select('.button.action-4')
+			.on('click', (d) => {
+				console.log('Delete', d);
+			});
+	}
+
+	removeButtonGroup() {
+		d3.select('#buttonGroup').remove();
+	}
+
+	updateSimulation(nodes: any[], links: any[]) {
+		console.log('Update nodes', nodes, links);
+	}
+
+	addNewNode() {
+		this.setState({ showNodeModal: true });
+	}
+
+	handleNodeOk() {
+		console.log('Ok');
+	}
+
+	handleNodeChange(e: any) {
+		const value = e.target.value;
+		const { selectedNode } = this.state;
+		this.setState({
+			selectedNode: {
+				...selectedNode,
+				name: value,
+			},
+		});
+	}
+
+	handleNodeCancel(visible: boolean) {
+		this.setState({ showNodeModal: visible });
+	}
+
+	handleLinkOk() {
+		console.log('Ok');
+	}
+
+	handleLinkChange(e: any) {
+		const value = e.target.value;
+		const { selectedLink } = this.state;
+		this.setState({
+			selectedLink: {
+				...selectedLink,
+				relative: value,
+			},
+		});
+	}
+
+	handleLinkCancel(visible: boolean) {
+		this.setState({ showLinkModal: visible });
+	}
+	
+	render() {
+		const { showNodeModal, showLinkModal, selectedNode, selectedLink } = this.state;
+
+		return (
+			<div className="visual-editor">
+				{/* <div className="visual-editor-tools">
+						<Button onClick={() => this.addNewNode()} size="large"
+								shape="circle" icon="plus-circle"></Button>
+				</div> */}
+				<div className="visual-editor-container" id="Neo4jContainer"></div>
+				<NodeModal
+					visible={showNodeModal}
+					name={selectedNode.name}
+					onOk={() => this.handleNodeOk()}
+					onChange={(e) => this.handleNodeChange(e)}
+					onCancel={(visible: boolean) => this.handleNodeCancel(visible)}
+				/>
+				<LinkModal
+					visible={showLinkModal}
+					name={selectedLink.relative}
+					onOk={() => this.handleLinkOk()}
+					onChange={(e) => this.handleLinkChange(e)}
+					onCancel={(visible: boolean) => this.handleLinkCancel(visible)}
+				/>
+			</div>
+		);
+	}
 }
 
 export default VisualEditor;
