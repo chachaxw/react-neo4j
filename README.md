@@ -45,4 +45,4 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## Screen Shot
 
-[React Neo4j](!https://github.com/chachaxw/neo4j-react/blob/master/public/screen-shot.png)
+[React Neo4j](!https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot.png)
