@@ -46,3 +46,8 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ## Screen Shot
 
 ![React Neo4j](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot.png)
+![React Neo4j](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot1.png)
+
+## References
+
+[Using D3 with React and TypeScript](https://spin.atomicobject.com/2017/07/20/d3-react-typescript/)
