@@ -1,3 +1,4 @@
+import { Modal } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.css';
@@ -6,6 +7,8 @@ import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
 import { nodes, links } from '../mock/';
 import { sortBy } from '../utils/utils';
+
+const { confirm } = Modal;
 
 interface InternalState {
 	showAddModal: boolean;
@@ -273,8 +276,8 @@ createLink(link: any) {
 
 		node.append('circle')
 			.attr("r", 30)
-			.attr('fill', '#FB95AF')
-			.attr('stroke', '#E0849B')
+			.attr('fill', '#0099cc')
+			.attr('stroke', '#237dac')
 			.attr('stroke-width', '2')
 
 		node.append('text')
@@ -310,7 +313,7 @@ createLink(link: any) {
 			}
 
 			node.select('circle')
-				.attr('stroke', '#FB95AF')
+				.attr('stroke', '#0099cc')
 				.attr('stroke-width', '12')
 				.attr('stroke-opacity', '0.5');
 		});
@@ -323,7 +326,7 @@ createLink(link: any) {
 			}
 
 			node.select('circle')
-				.attr('stroke', '#E0849B')
+				.attr('stroke', '#237dac')
 				.attr('stroke-width', '2')
 				.attr('stroke-opacity', '1');
 		});
@@ -334,12 +337,14 @@ createLink(link: any) {
 
 			if (node._groups[0][0].classList.contains('selected')) {
 				circle.attr('stroke-width', '2')
-					.attr('stroke', '#E0849B');
+					.attr('stroke', '#237dac');
 				node.attr('class', 'node');
+				self.removeButtonGroup();
 			} else {
 				circle.attr('stroke-width', '12')
-					.attr('stroke', '#FB95AF');
+					.attr('stroke', '#0099cc');
 				node.attr('class', 'node selected');
+				self.initButtonGroup();
 			}
 
 			self.setState({ selectedNode: d });
@@ -382,7 +387,7 @@ createLink(link: any) {
 			.attr('d', (d: any) => arcButton(d))
 			.attr('fill', '#D2D5DA')
 			.style('cursor', 'pointer')
-			.attr('stroke', '#f2f2f2')
+			.attr('stroke', '#f1f4f9')
 			.attr('stroke-width', 2)
 			.attr('stroke-opacity', 0.7);
 
@@ -393,7 +398,7 @@ createLink(link: any) {
 			.attr('class', 'text')
 			.attr('transform', (d: any) => `translate(${arcText.centroid(d)})`)
 			.attr('text-anchor', 'middle')
-			.attr('fill', '#A5ABB6')
+			.attr('fill', '#fff')
 			.attr('pointer-events', 'none')
 			.attr('font-size', 11)
 			.text(function(d: any, i: number) {
@@ -408,9 +413,23 @@ createLink(link: any) {
 
 	initButtonActions() {
 		const buttonGroup = d3.select('#buttonGroup');
+
+		buttonGroup.selectAll('.button')
+			.on('mouseenter', function() {
+				const button: any = d3.select(this);
+				button.attr('fill', '#0099cc');
+			})
+			.on('mouseleave', function() {
+				const button: any = d3.select(this);
+				button.attr('fill', '#D2D5DA');
+			})
+
 		buttonGroup.select('.button.action-0')
 			.on('click', (d) => {
-				console.log('Edit', d);
+				this.setState({
+					selectedNode: d,
+					showNodeModal: true,
+				});
 			});
 
 		buttonGroup.select('.button.action-1')
@@ -430,16 +449,50 @@ createLink(link: any) {
 
 		buttonGroup.select('.button.action-4')
 			.on('click', (d) => {
-				console.log('Delete', d);
+				confirm({
+					title: '确定删除该节点？',
+					onOk: () => {
+							this.removeNode(d);
+					},
+				});
 			});
+	}
+
+	updateSimulation() {
+		const { links, nodes } = this.state;
+
+		// Update node
+		let node = d3.select('.nodes')
+			.selectAll('.node')
+			.data(nodes, d => d);
+		node.exit().remove();
+		const nodeEnter = this.createNode(node);
+		node = nodeEnter.merge(node);
+
+		// Update link
+		let link = d3.select('.links')
+			.selectAll('.link')
+			.data(links, d => d);
+		link.exit().remove();
+		const linkEnter = this.createLink(link);
+		link = linkEnter.merge(link);
+
+		this.simulation.nodes(node)
+			.on('tick', () => this.handleTick(link, node));
+		this.simulation.force('link').links(link);
+		this.simulation.alphaTarget(0).restart();
+	}
+
+	removeNode(node: any) {
+		const nodes = this.state.nodes.filter(d => d.id !== node.id);
+		const links = this.state.links.filter(d => (d.source.id !== node.id && d.target.id !== node.id));
+		this.setState({ nodes, links }, () => {
+			this.updateSimulation();
+		});
 	}
 
 	removeButtonGroup() {
 		d3.select('#buttonGroup').remove();
-	}
-
-	updateSimulation(nodes: any[], links: any[]) {
-		console.log('Update nodes', nodes, links);
 	}
 
 	addNewNode() {

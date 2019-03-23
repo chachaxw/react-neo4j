@@ -47,6 +47,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ![React Neo4j](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot.png)
 ![React Neo4j](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot1.png)
+![React Neo4j](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot2.png)
 
 ## References
 
