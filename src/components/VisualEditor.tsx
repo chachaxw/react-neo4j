@@ -1,4 +1,4 @@
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.css';
@@ -16,6 +16,7 @@ interface InternalState {
 	showLinkModal: boolean;
 	selectedNode: any;
 	selectedLink: any;
+	selectedNodes: any[];
 	nodes: any[];
 	links: any[];
 }
@@ -31,9 +32,10 @@ class VisualEditor extends Component<any, InternalState> {
 			showNodeModal: false,
 			showLinkModal: false,
 			selectedNode: {},
+			selectedNodes: [],
 			selectedLink: {},
-			nodes: nodes,
-			links: links,
+			nodes,
+			links,
 		}
 	}
 
@@ -458,6 +460,10 @@ createLink(link: any) {
 			});
 	}
 
+	removeButtonGroup() {
+		d3.select('#buttonGroup').remove();
+	}
+
 	updateSimulation() {
 		const { links, nodes } = this.state;
 
@@ -477,10 +483,11 @@ createLink(link: any) {
 		const linkEnter = this.createLink(link);
 		link = linkEnter.merge(link);
 
-		this.simulation.nodes(node)
+		this.simulation.nodes(nodes)
 			.on('tick', () => this.handleTick(link, node));
-		this.simulation.force('link').links(link);
-		this.simulation.alphaTarget(0).restart();
+		this.simulation.force('link').links(links);
+		this.simulation.alpha(1).restart();
+		this.clearSelectedNodes();
 	}
 
 	removeNode(node: any) {
@@ -491,8 +498,28 @@ createLink(link: any) {
 		});
 	}
 
-	removeButtonGroup() {
-		d3.select('#buttonGroup').remove();
+	addNewLink() {
+		const { selectedNodes } = this.state;
+
+		if (!selectedNodes.length) {
+			return;
+		}
+
+		const link = {
+			source: selectedNodes[0],
+			target: selectedNodes[1],
+			linkType: 'LINK_TO',
+		};
+		const links = this.state.links.concat([link]);
+		this.setState({ links: this.formatLinks(links)! }, () => {
+			this.updateSimulation();
+		});
+	}
+
+	clearSelectedNodes() {
+		d3.selectAll('.node.selected')
+				.attr('class', 'node');
+		this.setState({ selectedNodes: [] });
 	}
 
 	addNewNode() {
@@ -500,7 +527,18 @@ createLink(link: any) {
 	}
 
 	handleNodeOk() {
-		console.log('Ok');
+		const { selectedNode } = this.state;
+		const nodes = this.state.nodes.map((item) => {
+				if(item.id === selectedNode.id) {
+						return selectedNode;
+				}
+				return item;
+		});
+
+		// Update node
+		this.setState({ nodes });
+		this.updateSimulation();
+		this.handleNodeCancel(false);
 	}
 
 	handleNodeChange(e: any) {
@@ -519,7 +557,18 @@ createLink(link: any) {
 	}
 
 	handleLinkOk() {
-		console.log('Ok');
+		const { selectedLink} = this.state;
+		const links = this.state.links.map((item) => {
+				if(item.id === selectedLink.id) {
+						return selectedLink;
+				}
+				return item;
+		});
+
+		// Update link
+		this.setState({ links });
+		this.updateSimulation();
+		this.handleLinkCancel(false);
 	}
 
 	handleLinkChange(e: any) {
@@ -542,12 +591,14 @@ createLink(link: any) {
 
 		return (
 			<div className="visual-editor">
-				{/* <div className="visual-editor-tools">
+				<div className="visual-editor-tools">
 						<Button onClick={() => this.addNewNode()} size="large"
-								shape="circle" icon="plus-circle"></Button>
-				</div> */}
+							shape="circle" icon="plus" type="primary">
+						</Button>
+				</div>
 				<div className="visual-editor-container" id="Neo4jContainer"></div>
 				<NodeModal
+					title="添加节点"
 					visible={showNodeModal}
 					name={selectedNode.name}
 					onOk={() => this.handleNodeOk()}
@@ -555,6 +606,7 @@ createLink(link: any) {
 					onCancel={(visible: boolean) => this.handleNodeCancel(visible)}
 				/>
 				<LinkModal
+					title="编辑节点关系"
 					visible={showLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleLinkOk()}

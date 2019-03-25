@@ -3,6 +3,7 @@ import { Form, Input, Modal } from 'antd';
 
 interface Props {
   name: string;
+  title: string;
   visible: boolean;
   onOk: () => void;
   onCancel: (visible: boolean) => void;
@@ -11,12 +12,12 @@ interface Props {
 
 export default function LinkModal(props: Props) {
 
-  const { name, visible, onOk, onCancel, onChange } = props;
+  const { name, title, visible, onOk, onCancel, onChange } = props;
   
   return (
     <Modal
       centered
-      title="编辑节点关系"
+      title={title}
       visible={visible}
       onOk={onOk}
       onCancel={() => onCancel(false)}

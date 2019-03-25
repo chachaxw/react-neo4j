@@ -7,9 +7,12 @@
     height: 400px;
     left: 0;
     top: 50%;
-    /* background-color: #fff; */
+    padding: 16px 8px;
+    font-size: 18px;
+    background-color: #fff;
+    border-radius: 0 4px 4px 0;
     transform: translateY(-50%);
-    /* box-shadow: 0 2px 8px rgba(0, 0, 0, .08); */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, .08);
 }
 
 .visual-editor-container {
