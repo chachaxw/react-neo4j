@@ -1,4 +1,4 @@
-import { Button, Modal } from 'antd';
+import { Button, Modal, Tooltip } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.css';
@@ -43,14 +43,15 @@ class VisualEditor extends Component<any, InternalState> {
 		const { nodes, links } = this.state;
 		const el = document.getElementById('Neo4jContainer');
 
-		if (!el) {
-			return;
-		}
-
 		this.initSimulation(el, nodes, this.formatLinks(links));
 	}
 
 	initSimulation(el: any, nodes: any, links: any) {
+
+		if (!el) {
+			return;
+		}
+
 		const width = el.clientWidth;
 		const height = el.clientHeight;
 
@@ -76,11 +77,13 @@ class VisualEditor extends Component<any, InternalState> {
 	}
 
 	handleTick(link: any, node: any) {
-		link.selectAll('.outline')
+		if (link) {
+			link.selectAll('.outline')
 			.attr('d', (d: any) => this.linkArc(d));
 
-		link.selectAll('.overlay')
-			.attr('d', (d: any) => this.linkArc(d));
+			link.selectAll('.overlay')
+				.attr('d', (d: any) => this.linkArc(d));
+		}
 
 		node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
 }
@@ -177,7 +180,7 @@ createLink(link: any) {
 			.attr('pointer-events', 'none')
 			.attr('href', (d: any, i: number) => `#linkPath${i}`)
 			.attr('startOffset', '50%')
-			.attr('font-size', '11px')
+			.attr('font-size', 12)
 			.attr('text-anchor', 'middle')
 			.text((d: any) => {
 					if(d.relative !== ''){
@@ -508,7 +511,7 @@ createLink(link: any) {
 		const link = {
 			source: selectedNodes[0],
 			target: selectedNodes[1],
-			linkType: 'LINK_TO',
+			relative: 'LINK_TO',
 		};
 		const links = this.state.links.concat([link]);
 		this.setState({ links: this.formatLinks(links)! }, () => {
@@ -536,8 +539,9 @@ createLink(link: any) {
 		});
 
 		// Update node
-		this.setState({ nodes });
-		this.updateSimulation();
+		this.setState({ nodes }, () => {
+			this.updateSimulation();
+		});
 		this.handleNodeCancel(false);
 	}
 
@@ -556,8 +560,9 @@ createLink(link: any) {
 		this.setState({ showNodeModal: visible });
 	}
 
+	// Update link
 	handleLinkOk() {
-		const { selectedLink} = this.state;
+		const { selectedLink } = this.state;
 		const links = this.state.links.map((item) => {
 				if(item.id === selectedLink.id) {
 						return selectedLink;
@@ -566,8 +571,9 @@ createLink(link: any) {
 		});
 
 		// Update link
-		this.setState({ links });
-		this.updateSimulation();
+		this.setState({ links }, () => {
+			this.updateSimulation();
+		});
 		this.handleLinkCancel(false);
 	}
 
@@ -592,9 +598,11 @@ createLink(link: any) {
 		return (
 			<div className="visual-editor">
 				<div className="visual-editor-tools">
+					<Tooltip title="Add Node" placement="right">
 						<Button onClick={() => this.addNewNode()} size="large"
 							shape="circle" icon="plus" type="primary">
 						</Button>
+					</Tooltip>
 				</div>
 				<div className="visual-editor-container" id="Neo4jContainer"></div>
 				<NodeModal
