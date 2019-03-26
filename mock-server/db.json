@@ -1,0 +1,28 @@
+{
+  "nodes": "[
+    {"id": 0, "name": "创投大厦"},
+    {"id": 1, "name": "三诺"},
+    {"id": 2, "name": "36楼"},
+    {"id": 3, "name": "SEVEN-ELEVEN"},
+    {"id": 4, "name": "创茶空间"},
+    {"id": 5, "name": "驿站1号桩"},
+    {"id": 6, "name": "驿站2号桩"},
+    {"id": 7, "name": "驿站3号桩"},
+    {"id": 8, "name": "驿站4号桩"},
+    {"id": 9, "name": "驿站5号桩"},
+    {"id": 10, "name": "驿站6号桩"}
+  ]",
+  "links": "[
+    {"id": 0, "value": 1, "source": 0, "target": 1, "relative": "LINK_TO"},
+    {"id": 1, "value": 1, "source": 1, "target": 0, "relative": "LINK_TO"},
+    {"id": 2, "value": 2, "source": 0, "target": 2, "relative": "REFERENCE"},
+    {"id": 3, "value": 3, "source": 0, "target": 3, "relative": "REFERENCE"},
+    {"id": 4, "value": 4, "source": 1, "target": 4, "relative": "REFERENCE"},
+    {"id": 5, "value": 2, "source": 0, "target": 5, "relative": "REFERENCE"},
+    {"id": 6, "value": 2, "source": 0, "target": 6, "relative": "REFERENCE"},
+    {"id": 7, "value": 2, "source": 0, "target": 7, "relative": "REFERENCE"},
+    {"id": 8, "value": 2, "source": 0, "target": 8, "relative": "REFERENCE"},
+    {"id": 9, "value": 2, "source": 0, "target": 9, "relative": "REFERENCE"},
+    {"id": 10, "value": 2, "source": 9, "target": 10, "relative": "REFERENCE"}
+  ]"
+}

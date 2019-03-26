@@ -5,7 +5,6 @@ import './VisualEditor.css';
 
 import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
-import { nodes, links } from '../mock/';
 import { sortBy } from '../utils/utils';
 
 const { confirm } = Modal;
@@ -34,8 +33,8 @@ class VisualEditor extends Component<any, InternalState> {
 			selectedNode: {},
 			selectedNodes: [],
 			selectedLink: {},
-			nodes,
-			links,
+			nodes: [],
+			links: [],
 		}
 	}
 
