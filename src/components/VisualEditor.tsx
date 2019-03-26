@@ -1,21 +1,31 @@
-import { Button, Modal, Tooltip } from 'antd';
+import { Button, Layout, Modal, Row, Tooltip, Spin, Icon } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.css';
 
 import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
+import Loading from './Loading';
 import { sortBy } from '../utils/utils';
+import { ApiService } from '../services/ApiService';
 
 const { confirm } = Modal;
+const { Content } = Layout;
+
+interface Node {
+	id: number | string;
+	name: string;
+}
 
 interface InternalState {
-	showAddModal: boolean;
+	loading: boolean;
+	showAddNodeModal: boolean;
 	showNodeModal: boolean;
 	showLinkModal: boolean;
 	selectedNode: any;
 	selectedLink: any;
 	selectedNodes: any[];
+	newNode: Node;
 	nodes: any[];
 	links: any[];
 }
@@ -27,25 +37,33 @@ class VisualEditor extends Component<any, InternalState> {
 		super(props);
 
 		this.state = {
-			showAddModal: false,
+			loading: true,
+			showAddNodeModal: false,
 			showNodeModal: false,
 			showLinkModal: false,
 			selectedNode: {},
 			selectedNodes: [],
 			selectedLink: {},
+			newNode: {
+				id: 0,
+				name: '',
+			},
 			nodes: [],
 			links: [],
 		}
 	}
 
-	componentDidMount() {
-		const { nodes, links } = this.state;
-		const el = document.getElementById('Neo4jContainer');
+	async componentDidMount() {
+		const {data: nodes} = await ApiService.fetchNodes();
+		const {data: links} = await ApiService.fetchLinks();
 
-		this.initSimulation(el, nodes, this.formatLinks(links));
+		this.setState({	loading: false, nodes, links }, () => {
+			const el = document.getElementById('Neo4jContainer');
+			this.initSimulation(el, nodes, this.formatLinks(links));
+		});
 	}
 
-	initSimulation(el: any, nodes: any, links: any) {
+	initSimulation(el: any, nodes: any[], links: any[]) {
 
 		if (!el) {
 			return;
@@ -116,7 +134,7 @@ class VisualEditor extends Component<any, InternalState> {
 
 	formatLinks(links: any[]) {
 		if (!links || !(links && links.length > 0)) {
-			return;
+			return [];
 		}
 
 		links.forEach((link: any) => {
@@ -156,7 +174,7 @@ class VisualEditor extends Component<any, InternalState> {
 
 createLink(link: any) {
 
-		if(!link && !link.enter()) {
+		if(!link || (link && !link._enter)) {
 				return;
 		}
 
@@ -513,7 +531,7 @@ createLink(link: any) {
 			relative: 'LINK_TO',
 		};
 		const links = this.state.links.concat([link]);
-		this.setState({ links: this.formatLinks(links)! }, () => {
+		this.setState({ links: this.formatLinks(links) }, () => {
 			this.updateSimulation();
 		});
 	}
@@ -528,13 +546,38 @@ createLink(link: any) {
 		this.setState({ showNodeModal: true });
 	}
 
+	handleAddNodeOk() {
+		const { nodes, newNode } = this.state;
+		this.setState({ nodes: nodes.concat([newNode]) }, () => {
+			this.updateSimulation();
+		});
+		this.handleAddNodeCancel(false);
+	}
+
+	handleAddNodeChange(e: any) {
+		this.setState({
+			newNode: {
+				id: this.state.nodes.length,
+				name: e.target.value,
+				x: 200,
+				y: 200,
+				fx: 50,
+				fy: 50,
+			},
+		});
+	}
+
+	handleAddNodeCancel(visible: boolean) {
+		this.setState({ showAddNodeModal: visible });
+	}
+
 	handleNodeOk() {
 		const { selectedNode } = this.state;
 		const nodes = this.state.nodes.map((item) => {
-				if(item.id === selectedNode.id) {
-						return selectedNode;
-				}
-				return item;
+			if(item.id === selectedNode.id) {
+				return selectedNode;
+			}
+			return item;
 		});
 
 		// Update node
@@ -592,10 +635,15 @@ createLink(link: any) {
 	}
 	
 	render() {
-		const { showNodeModal, showLinkModal, selectedNode, selectedLink } = this.state;
+		const { showAddNodeModal, showNodeModal, showLinkModal,
+			newNode, selectedNode, selectedLink } = this.state;
+
+		if (this.state.loading) {
+			return <Loading />;
+		}
 
 		return (
-			<div className="visual-editor">
+			<Content className="visual-editor">
 				<div className="visual-editor-tools">
 					<Tooltip title="Add Node" placement="right">
 						<Button onClick={() => this.addNewNode()} size="large"
@@ -606,6 +654,14 @@ createLink(link: any) {
 				<div className="visual-editor-container" id="Neo4jContainer"></div>
 				<NodeModal
 					title="添加节点"
+					visible={showAddNodeModal}
+					name={newNode.name}
+					onOk={() => this.handleAddNodeOk()}
+					onChange={(e) => this.handleAddNodeChange(e)}
+					onCancel={(visible: boolean) => this.handleAddNodeCancel(visible)}
+				/>
+				<NodeModal
+					title="编辑节点"
 					visible={showNodeModal}
 					name={selectedNode.name}
 					onOk={() => this.handleNodeOk()}
@@ -620,7 +676,7 @@ createLink(link: any) {
 					onChange={(e) => this.handleLinkChange(e)}
 					onCancel={(visible: boolean) => this.handleLinkCancel(visible)}
 				/>
-			</div>
+			</Content>
 		);
 	}
 }

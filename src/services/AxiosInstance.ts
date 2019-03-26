@@ -1,15 +1,6 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import qs from 'qs';
 
-import { ServerEnv } from '../env';
-
-export interface Pagination {
-  page: number;
-  pageSize: number;
-  totalCount: number;
-  totalPageCount: number;
-}
-
 interface CustomizeConfig extends AxiosRequestConfig {
   retry: number;
   retryDelay: number;
@@ -17,9 +8,9 @@ interface CustomizeConfig extends AxiosRequestConfig {
 
 // axios config options
 const options: CustomizeConfig = {
-  baseURL: ServerEnv.api + '/api',
+  baseURL: 'http://localhost:3031',
   timeout: 10000,
-  retry: 4,
+  retry: 1,
   retryDelay: 1000,
   // 查询对象序列化函数
   paramsSerializer: (params: any) => qs.stringify(params),

@@ -19,7 +19,7 @@ yarn install
 yarn start
 ```
 
-Then you can access `http://localhost:3001/nodes/` to see if the server is started correctly.
+Then you can access `http://localhost:3031/nodes/` to see if the server is started correctly.
 
 ## APIs
 
@@ -30,7 +30,7 @@ Also here are some APIs you might want to use:
 ### Get nodes list
 
 ```
-GET http://localhost:3001/nodes
+GET http://localhost:3031/nodes
 ```
 
 The response of this request would be the JSON of all nodes list.
@@ -38,7 +38,7 @@ The response of this request would be the JSON of all nodes list.
 ### Get links list
 
 ```
-GET http://localhost:3001/agents/{id}
+GET http://localhost:3031/agents/{id}
 ```
 
 The response of this request would be the JSON of the agent which match the id.
@@ -46,7 +46,7 @@ The response of this request would be the JSON of the agent which match the id.
 ### Change one node
 
 ```
-PUT http://localhost:3001/nodes/{id}
+PUT http://localhost:3031/nodes/{id}
 {
     "headers": {
         "Content-Type": "application/json"
@@ -71,7 +71,7 @@ The response of this request would be the JSON of the modified nodes
 ### Change one link
 
 ```
-PUT http://localhost:3001/links/{id}
+PUT http://localhost:3031/links/{id}
 {
     “headers”: {
         “Content-Type”: “application/json”

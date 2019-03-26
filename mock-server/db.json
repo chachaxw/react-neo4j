@@ -1,5 +1,5 @@
 {
-  "nodes": "[
+  "nodes": [
     {"id": 0, "name": "创投大厦"},
     {"id": 1, "name": "三诺"},
     {"id": 2, "name": "36楼"},
@@ -11,8 +11,8 @@
     {"id": 8, "name": "驿站4号桩"},
     {"id": 9, "name": "驿站5号桩"},
     {"id": 10, "name": "驿站6号桩"}
-  ]",
-  "links": "[
+  ],
+  "links": [
     {"id": 0, "value": 1, "source": 0, "target": 1, "relative": "LINK_TO"},
     {"id": 1, "value": 1, "source": 1, "target": 0, "relative": "LINK_TO"},
     {"id": 2, "value": 2, "source": 0, "target": 2, "relative": "REFERENCE"},
@@ -24,5 +24,5 @@
     {"id": 8, "value": 2, "source": 0, "target": 8, "relative": "REFERENCE"},
     {"id": 9, "value": 2, "source": 0, "target": 9, "relative": "REFERENCE"},
     {"id": 10, "value": 2, "source": 9, "target": 10, "relative": "REFERENCE"}
-  ]"
+  ]
 }

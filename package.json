@@ -6,6 +6,7 @@
     "@types/d3": "^5.7.1",
     "@types/jest": "24.0.11",
     "@types/node": "^11.11.4",
+    "@types/qs": "^6.5.2",
     "@types/react": "^16.8.8",
     "@types/react-dom": "^16.8.3",
     "antd": "^3.15.1",
@@ -25,7 +26,8 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "mock": "json-server --watch ./mock-server/db.json --port 3031"
   },
   "eslintConfig": {
     "extends": "react-app"
