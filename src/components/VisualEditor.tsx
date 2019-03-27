@@ -414,7 +414,7 @@ createLink(link: any) {
 		const data = [1, 1, 1, 1, 1];
 		const buttonGroup = d3.select('.node.selected').append('g')
 			.attr('id', 'buttonGroup');
-		
+
 		const pieData = d3.pie()(data);
 		const arcButton = d3.arc().innerRadius(32).outerRadius(64);
 		const arcText = d3.arc().innerRadius(32).outerRadius(60);
@@ -530,34 +530,36 @@ createLink(link: any) {
 
 	removeNode(node: any) {
 		const nodes = this.state.nodes.filter(d => d.id !== node.id);
-		const links = this.state.links.filter(d => (d.source.id !== node.id && d.target.id !== node.id));
-		this.setState({ nodes, links }, () => {
+    const links = this.state.links.filter(d => (d.source.id !== node.id && d.target.id !== node.id));
+
+		this.setState({ nodes, links }, async () => {
+      await ApiService.deleteNode(node.id);
 			this.updateSimulation();
 		});
 	}
 
 	// Add new link
-	addNewLink() {
+	showAddLink() {
 		this.setState({ showAddLinkModal: true });
 	}
 
 	handleAddLinkOk() {
-		const { selectedNodes, newLink } = this.state;
+    const { selectedNodes, newLink } = this.state;
+    console.log(selectedNodes, newLink);
+  }
 
-		if (!selectedNodes.length) {
-			return;
-		}
-
-		const link = {
-			source: selectedNodes[0],
-			target: selectedNodes[1],
-			relative: 'LINK_TO',
-		};
-		const links = this.state.links.concat([link]);
-		this.setState({ links: this.formatLinks(links) }, () => {
+  addLink(source: number | string, target: number | string, relative: string) {
+    const link = {
+			source,
+			target,
+			relative,
+    };
+    const links = this.state.links.concat([link]);
+		this.setState({ links: this.formatLinks(links) }, async () => {
+      await ApiService.postLink(link);
 			this.updateSimulation();
 		});
-	}
+  }
 
 	handleAddLinkChange(e: any) {
 		this.setState({
@@ -681,7 +683,7 @@ createLink(link: any) {
 	handleLinkCancel(visible: boolean) {
 		this.setState({ showLinkModal: visible });
 	}
-	
+
 	render() {
 		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,
 			newNode, selectedNode, selectedLink, scale } = this.state;

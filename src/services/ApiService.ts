@@ -17,6 +17,10 @@ export class ApiService {
     return AxiosInstance.patch(`${ApiUrl.nodes}/${id}`, params);
   }
 
+  public static deleteNode(id: number | string): Promise<AxiosResponse> {
+    return AxiosInstance.delete(`${ApiUrl.nodes}/${id}`);
+  }
+
   public static fetchLinks(params?: any): Promise<AxiosResponse> {
     return AxiosInstance.get(ApiUrl.links, params);
   }
@@ -27,5 +31,9 @@ export class ApiService {
 
   public static patchLink(id: number | string, params: any): Promise<AxiosResponse> {
     return AxiosInstance.patch(`${ApiUrl.links}/${id}`, params);
+  }
+
+  public static deleteLink(id: number | string): Promise<AxiosResponse> {
+    return AxiosInstance.delete(`${ApiUrl.links}/${id}`);
   }
 }
