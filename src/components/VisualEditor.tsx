@@ -17,8 +17,16 @@ interface Node {
 	name: string;
 }
 
+interface Link {
+	id: number | string;
+	source: number | string | object | null;
+	target: number | string | object | null;
+	relative: string;
+}
+
 interface InternalState {
 	loading: boolean;
+	showAddLinkModal: boolean;
 	showAddNodeModal: boolean;
 	showNodeModal: boolean;
 	showLinkModal: boolean;
@@ -26,8 +34,10 @@ interface InternalState {
 	selectedLink: any;
 	selectedNodes: any[];
 	newNode: Node;
+	newLink: Link;
 	nodes: any[];
 	links: any[];
+	scale: number;
 }
 
 class VisualEditor extends Component<any, InternalState> {
@@ -38,6 +48,7 @@ class VisualEditor extends Component<any, InternalState> {
 
 		this.state = {
 			loading: true,
+			showAddLinkModal: false,
 			showAddNodeModal: false,
 			showNodeModal: false,
 			showLinkModal: false,
@@ -48,8 +59,15 @@ class VisualEditor extends Component<any, InternalState> {
 				id: 0,
 				name: '',
 			},
+			newLink: {
+				id: 0,
+				source: null,
+				target: null,
+				relative: 'LINK_TO',
+			},
 			nodes: [],
 			links: [],
+			scale: 100,
 		}
 	}
 
@@ -381,11 +399,11 @@ createLink(link: any) {
 		const arrow = svg.append('marker')
 			.attr('id', 'ArrowMarker')
 			.attr('markerUnits', 'strokeWidth')
-			.attr('markerWidth', '18')
-			.attr('markerHeight', '18')
+			.attr('markerWidth', 18)
+			.attr('markerHeight', 18)
 			.attr('viewBox', '0 0 12 12')
-			.attr('refX', '28')
-			.attr('refY', '6')
+			.attr('refX', 30)
+			.attr('refY', 6)
 			.attr('orient', 'auto');
 
 		const arrowPath = 'M2,2 L10,6 L2,10 L6,6 L2,2';
@@ -518,8 +536,13 @@ createLink(link: any) {
 		});
 	}
 
+	// Add new link
 	addNewLink() {
-		const { selectedNodes } = this.state;
+		this.setState({ showAddLinkModal: true });
+	}
+
+	handleAddLinkOk() {
+		const { selectedNodes, newLink } = this.state;
 
 		if (!selectedNodes.length) {
 			return;
@@ -536,6 +559,27 @@ createLink(link: any) {
 		});
 	}
 
+	handleAddLinkChange(e: any) {
+		this.setState({
+			newLink: {
+				...this.state.newLink,
+				relative: e.target.value,
+			}
+		});
+	}
+
+	handleAddLinkCancel(visible: boolean) {
+		this.setState({
+			showAddLinkModal: visible,
+			newLink: {
+				id: 0,
+				source: null,
+				target: null,
+				relative: ''
+			},
+		});
+	}
+
 	clearSelectedNodes() {
 		d3.selectAll('.node.selected')
 				.attr('class', 'node');
@@ -543,12 +587,13 @@ createLink(link: any) {
 	}
 
 	addNewNode() {
-		this.setState({ showNodeModal: true });
+		this.setState({ showAddNodeModal: true });
 	}
 
 	handleAddNodeOk() {
 		const { nodes, newNode } = this.state;
-		this.setState({ nodes: nodes.concat([newNode]) }, () => {
+		this.setState({ nodes: nodes.concat([newNode]) }, async () => {
+			await ApiService.postNode({ name: newNode.name });
 			this.updateSimulation();
 		});
 		this.handleAddNodeCancel(false);
@@ -581,7 +626,8 @@ createLink(link: any) {
 		});
 
 		// Update node
-		this.setState({ nodes }, () => {
+		this.setState({ nodes }, async () => {
+			await ApiService.patchNode(selectedNode.id, { name: selectedNode.name });
 			this.updateSimulation();
 		});
 		this.handleNodeCancel(false);
@@ -612,8 +658,10 @@ createLink(link: any) {
 				return item;
 		});
 
-		// Update link
-		this.setState({ links }, () => {
+		this.setState({ links }, async () => {
+			const { id, value, source, target, relative } = selectedLink;
+			const params = { id, value, source, target, relative };
+			await ApiService.patchLink(id, params);
 			this.updateSimulation();
 		});
 		this.handleLinkCancel(false);
@@ -635,8 +683,8 @@ createLink(link: any) {
 	}
 	
 	render() {
-		const { showAddNodeModal, showNodeModal, showLinkModal,
-			newNode, selectedNode, selectedLink } = this.state;
+		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,
+			newNode, selectedNode, selectedLink, scale } = this.state;
 
 		if (this.state.loading) {
 			return <Loading />;
@@ -667,6 +715,14 @@ createLink(link: any) {
 					onOk={() => this.handleNodeOk()}
 					onChange={(e) => this.handleNodeChange(e)}
 					onCancel={(visible: boolean) => this.handleNodeCancel(visible)}
+				/>
+				<LinkModal
+					title="添加节点关系"
+					visible={showAddLinkModal}
+					name={selectedLink.relative}
+					onOk={() => this.handleAddLinkOk()}
+					onChange={(e: any) => this.handleAddLinkChange(e)}
+					onCancel={(visible: boolean) => this.handleAddLinkCancel(visible)}
 				/>
 				<LinkModal
 					title="编辑节点关系"

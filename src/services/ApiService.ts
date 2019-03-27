@@ -9,8 +9,23 @@ export class ApiService {
     return AxiosInstance.get(ApiUrl.nodes, params);
   }
 
+  public static postNode(params: any): Promise<AxiosResponse> {
+    return AxiosInstance.post(ApiUrl.nodes, params);
+  }
+
+  public static patchNode(id: number | string, params: any): Promise<AxiosResponse> {
+    return AxiosInstance.patch(`${ApiUrl.nodes}/${id}`, params);
+  }
+
   public static fetchLinks(params?: any): Promise<AxiosResponse> {
     return AxiosInstance.get(ApiUrl.links, params);
   }
 
+  public static postLink(params: any): Promise<AxiosResponse> {
+    return AxiosInstance.post(ApiUrl.links, params);
+  }
+
+  public static patchLink(id: number | string, params: any): Promise<AxiosResponse> {
+    return AxiosInstance.patch(`${ApiUrl.links}/${id}`, params);
+  }
 }
