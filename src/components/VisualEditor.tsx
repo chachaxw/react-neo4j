@@ -1,4 +1,4 @@
-import { Button, Form, Layout, Modal, Row, Tooltip, Icon, InputNumber } from 'antd';
+import { Layout, Modal } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.css';
@@ -8,17 +8,18 @@ import LinkModal from './LinkModal';
 import Loading from './Loading';
 import { sortBy } from '../utils/utils';
 import { ApiService } from '../services/ApiService';
+import TopTools from './TopTools';
 
 const { confirm } = Modal;
 const { Content } = Layout;
 
 interface Node {
-	id: number | string;
+	id?: number | string;
 	name: string;
 }
 
 interface Link {
-	id: number | string;
+	id?: number | string;
 	source: number | string | object | null;
 	target: number | string | object | null;
 	relative: string;
@@ -37,7 +38,7 @@ interface InternalState {
 	newLink: Link;
 	nodes: any[];
 	links: any[];
-	scale: number;
+  scale: number;
 }
 
 class VisualEditor extends Component<any, InternalState> {
@@ -47,7 +48,7 @@ class VisualEditor extends Component<any, InternalState> {
 		super(props);
 
 		this.state = {
-			loading: true,
+      loading: true,
 			showAddLinkModal: false,
 			showAddNodeModal: false,
 			showNodeModal: false,
@@ -594,7 +595,7 @@ createLink(link: any) {
 		this.setState({ selectedNodes: [] });
 	}
 
-	addNewNode() {
+	showAddNode() {
 		this.setState({ showAddNodeModal: true });
 	}
 
@@ -610,7 +611,6 @@ createLink(link: any) {
 	handleAddNodeChange(e: any) {
 		this.setState({
 			newNode: {
-				id: this.state.nodes.length,
 				name: e.target.value,
 				x: 200,
 				y: 200,
@@ -688,7 +688,7 @@ createLink(link: any) {
 
 	handleLinkCancel(visible: boolean) {
 		this.setState({ showLinkModal: visible });
-	}
+  }
 
 	render() {
 		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,
@@ -700,28 +700,10 @@ createLink(link: any) {
 
 		return (
 			<Content className="visual-editor">
-				<Form layout="inline" className="visual-editor-tools">
-					<Form.Item>
-            <Tooltip title="Add Node" placement="bottom">
-              <Button onClick={() => this.addNewNode()} size="large"
-                shape="circle" icon="plus" type="primary">
-              </Button>
-            </Tooltip>
-          </Form.Item>
-          <Form.Item>
-            <Tooltip title="Full Screen" placement="bottom">
-              <Button size="large" shape="circle" icon="arrows-alt" type="primary" />
-            </Tooltip>
-          </Form.Item>
-          <Form.Item>
-            <InputNumber
-              defaultValue={100}
-              min={12.5} max={1000}
-              formatter={value => `${value}%`}
-              parser={value => value ? Number(value.replace('%', '')) : 100}
-            />
-          </Form.Item>
-				</Form>
+        <TopTools
+          scale={scale}
+          showAddNode={() => this.showAddNode()}
+          />
 				<div className="visual-editor-container" id="Neo4jContainer"></div>
 				<NodeModal
 					title="添加节点"
