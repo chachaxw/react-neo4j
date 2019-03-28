@@ -57,14 +57,13 @@ export default class TopTools extends Component<InternalProps, InternalState> {
       <Form layout="inline" className="visual-editor-tools">
         <Form.Item>
           <Tooltip title="Add Node" placement="bottom">
-            <Button onClick={showAddNode} size="large"
-              shape="circle" icon="plus" type="primary">
-            </Button>
+            <Button onClick={showAddNode} shape="circle" icon="plus" type="primary" />
           </Tooltip>
         </Form.Item>
         <Form.Item>
           <Tooltip title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'} placement="bottom">
-            <Button size="large" shape="circle" type="primary"
+            <Button
+              shape="circle" type="primary"
               icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
               onClick={() => this.setFullScreen()}
             />
@@ -72,8 +71,10 @@ export default class TopTools extends Component<InternalProps, InternalState> {
         </Form.Item>
         <Form.Item>
           <InputNumber
-            min={12.5} max={1000}
-            defaultValue={scale || 100}
+            min={12.5}
+            max={500}
+            value={scale}
+            defaultValue={100}
             formatter={value => `${value}%`}
             parser={value => value ? Number(value.replace('%', '')) : 100}
           />

@@ -93,7 +93,7 @@ class VisualEditor extends Component<any, InternalState> {
 
 		this.simulation = d3.forceSimulation(nodes)
 			.force("link", d3.forceLink(links).distance(180).id((d: any) => d.id))
-			.force("charge", d3.forceManyBody().strength(-800))
+			.force("charge", d3.forceManyBody().distanceMax(400).strength(-800))
 			.force("collide", d3.forceCollide().strength(-60))
 			.force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -146,7 +146,15 @@ class VisualEditor extends Component<any, InternalState> {
 	onZoom(svg: any) {
 		// 鼠标滚轮缩放
 		svg.call(d3.zoom().on('zoom', () => {
-			d3.selectAll('#Neo4jContainer > svg > g').attr('transform', d3.event.transform);
+      const { transform } = d3.event;
+      const scale = Number((transform.k * 100).toFixed());
+
+      if (scale <= 12.5 || scale >= 500) {
+        return;
+      }
+
+      this.setState({ scale });
+			d3.selectAll('#Neo4jContainer > svg > g').attr('transform', transform);
 		}));
 		svg.on('dblclick.zoom', null); // 静止双击缩放
 	}
@@ -294,7 +302,11 @@ createLink(link: any) {
 		}
 
 		return `M${d.source.x},${d.source.y}A${arc},${arc} 0 0,${d.sameArcDirection} ${d.target.x},${d.target.y}`;
-	}
+  }
+
+  drawLink() {
+    console.log('Draw Link');
+  }
 
 	initNodes(nodes: any, svg: any) {
 		const node = svg.append('g')
@@ -380,12 +392,12 @@ createLink(link: any) {
 				circle.attr('stroke-width', '2')
 					.attr('stroke', '#237dac');
 				node.attr('class', 'node');
-				self.removeButtonGroup();
+				self.removeButtonGroup(node);
 			} else {
 				circle.attr('stroke-width', '12')
 					.attr('stroke', '#0099cc');
 				node.attr('class', 'node selected');
-				self.initButtonGroup();
+				self.addButtonGroup(node);
 			}
 
 			self.setState({ selectedNode: d });
@@ -411,9 +423,9 @@ createLink(link: any) {
 		arrow.append('path').attr('d', arrowPath).attr('fill', '#A5ABB6');
 	}
 
-	initButtonGroup() {
+	addButtonGroup(node: any) {
 		const data = [1, 1, 1, 1, 1];
-		const buttonGroup = d3.select('.node.selected').append('g')
+		const buttonGroup = node.append('g')
 			.attr('id', 'buttonGroup');
 
 		const pieData = d3.pie()(data);
@@ -424,7 +436,7 @@ createLink(link: any) {
 			.data(pieData)
 			.enter()
 			.append('path')
-			.attr('class', (d, i) => `button action-${i}`)
+			.attr('class', (d: any, i: number) => `button action-${i}`)
 			.attr('d', (d: any) => arcButton(d))
 			.attr('fill', '#D2D5DA')
 			.style('cursor', 'pointer')
@@ -499,8 +511,8 @@ createLink(link: any) {
 			});
 	}
 
-	removeButtonGroup() {
-		d3.select('#buttonGroup').remove();
+	removeButtonGroup(node: any) {
+		node.select('#buttonGroup').remove();
 	}
 
 	updateSimulation() {
@@ -612,10 +624,6 @@ createLink(link: any) {
 		this.setState({
 			newNode: {
 				name: e.target.value,
-				x: 200,
-				y: 200,
-				fx: 50,
-				fy: 50,
 			},
 		});
 	}
