@@ -9,10 +9,6 @@
       "name": "三诺"
     },
     {
-      "id": 2,
-      "name": "36楼"
-    },
-    {
       "id": 4,
       "name": "创茶空间"
     },
@@ -35,10 +31,6 @@
     {
       "id": 9,
       "name": "驿站5号桩"
-    },
-    {
-      "id": 10,
-      "name": "驿站6号桩"
     }
   ],
   "links": [
@@ -55,13 +47,6 @@
       "source": 1,
       "target": 0,
       "relative": "LINK_TO"
-    },
-    {
-      "id": 2,
-      "value": 2,
-      "source": 0,
-      "target": 2,
-      "relative": "REFERENCE"
     },
     {
       "id": 4,
@@ -103,13 +88,6 @@
       "value": 2,
       "source": 0,
       "target": 9,
-      "relative": "REFERENCE"
-    },
-    {
-      "id": 10,
-      "value": 2,
-      "source": 9,
-      "target": 10,
       "relative": "REFERENCE"
     }
   ]

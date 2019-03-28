@@ -1,4 +1,4 @@
-import { Button, Layout, Modal, Row, Tooltip, Spin, Icon } from 'antd';
+import { Button, Form, Layout, Modal, Row, Tooltip, Icon, InputNumber } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.css';
@@ -529,11 +529,17 @@ createLink(link: any) {
 	}
 
 	removeNode(node: any) {
-		const nodes = this.state.nodes.filter(d => d.id !== node.id);
-    const links = this.state.links.filter(d => (d.source.id !== node.id && d.target.id !== node.id));
+    const { nodes, links  } = this.state;
 
-		this.setState({ nodes, links }, async () => {
-      await ApiService.deleteNode(node.id);
+		this.setState({
+      nodes: nodes.filter(d => d.id !== node.id),
+      links: links.filter(d => (d.source.id !== node.id && d.target.id !== node.id)),
+    }, async () => {
+      links.filter(d => (d.source.id === node.id || d.target.id === node.id))
+        .map(d => {
+          ApiService.deleteLink(d.id);
+        });
+      ApiService.deleteNode(node.id);
 			this.updateSimulation();
 		});
 	}
@@ -694,13 +700,28 @@ createLink(link: any) {
 
 		return (
 			<Content className="visual-editor">
-				<div className="visual-editor-tools">
-					<Tooltip title="Add Node" placement="right">
-						<Button onClick={() => this.addNewNode()} size="large"
-							shape="circle" icon="plus" type="primary">
-						</Button>
-					</Tooltip>
-				</div>
+				<Form layout="inline" className="visual-editor-tools">
+					<Form.Item>
+            <Tooltip title="Add Node" placement="bottom">
+              <Button onClick={() => this.addNewNode()} size="large"
+                shape="circle" icon="plus" type="primary">
+              </Button>
+            </Tooltip>
+          </Form.Item>
+          <Form.Item>
+            <Tooltip title="Full Screen" placement="bottom">
+              <Button size="large" shape="circle" icon="arrows-alt" type="primary" />
+            </Tooltip>
+          </Form.Item>
+          <Form.Item>
+            <InputNumber
+              defaultValue={100}
+              min={12.5} max={1000}
+              formatter={value => `${value}%`}
+              parser={value => value ? Number(value.replace('%', '')) : 100}
+            />
+          </Form.Item>
+				</Form>
 				<div className="visual-editor-container" id="Neo4jContainer"></div>
 				<NodeModal
 					title="添加节点"
