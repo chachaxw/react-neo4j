@@ -3,6 +3,7 @@ import { Button, Form, Tooltip, Icon, InputNumber } from 'antd';
 
 interface InternalProps {
   scale: number;
+  restart: () => void;
   showAddNode: () => void;
 }
 
@@ -28,7 +29,7 @@ export default class TopTools extends Component<InternalProps, InternalState> {
   }
 
   keyboardPress(ev: KeyboardEvent) {
-    console.log(ev);
+    // console.log(ev);
     if (ev.key === 'Escape') {
       if (this.state.isFullScreen) {
         this.setState({ isFullScreen: false });
@@ -51,7 +52,7 @@ export default class TopTools extends Component<InternalProps, InternalState> {
 
   render() {
     const { isFullScreen } = this.state;
-    const { scale, showAddNode } = this.props;
+    const { restart, scale, showAddNode } = this.props;
 
     return (
       <Form layout="inline" className="visual-editor-tools">
@@ -70,9 +71,15 @@ export default class TopTools extends Component<InternalProps, InternalState> {
           </Tooltip>
         </Form.Item>
         <Form.Item>
+          <Tooltip title="Restart" placement="bottom">
+            <Button onClick={restart} shape="circle" icon="reload" type="primary" />
+          </Tooltip>
+        </Form.Item>
+        <Form.Item>
           <InputNumber
             min={12.5}
             max={500}
+            step={15}
             value={scale}
             defaultValue={100}
             formatter={value => `${value}%`}

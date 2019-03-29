@@ -33,7 +33,6 @@ interface InternalState {
 	showLinkModal: boolean;
 	selectedNode: any;
 	selectedLink: any;
-	selectedNodes: any[];
 	newNode: Node;
 	newLink: Link;
 	nodes: any[];
@@ -54,7 +53,6 @@ class VisualEditor extends Component<any, InternalState> {
 			showNodeModal: false,
 			showLinkModal: false,
 			selectedNode: {},
-			selectedNodes: [],
 			selectedLink: {},
 			newNode: {
 				id: 0,
@@ -77,9 +75,9 @@ class VisualEditor extends Component<any, InternalState> {
 		const {data: links} = await ApiService.fetchLinks();
 
 		this.setState({	loading: false, nodes, links }, () => {
-			const el = document.getElementById('Neo4jContainer');
-			this.initSimulation(el, nodes, this.formatLinks(links));
-		});
+      const el = document.getElementById('Neo4jContainer');
+      this.initSimulation(el, nodes, this.formatLinks(links));
+    });
 	}
 
 	initSimulation(el: any, nodes: any[], links: any[]) {
@@ -92,8 +90,8 @@ class VisualEditor extends Component<any, InternalState> {
 		const height = el.clientHeight;
 
 		this.simulation = d3.forceSimulation(nodes)
-			.force("link", d3.forceLink(links).distance(180).id((d: any) => d.id))
-			.force("charge", d3.forceManyBody().distanceMax(400).strength(-800))
+			.force("link", d3.forceLink(links).distance(160).id((d: any) => d.id))
+			.force("charge", d3.forceManyBody().distanceMax(300).strength(-800))
 			.force("collide", d3.forceCollide().strength(-60))
 			.force("center", d3.forceCenter(width / 2, height / 2));
 
@@ -110,7 +108,14 @@ class VisualEditor extends Component<any, InternalState> {
 
 		this.simulation.on('tick', () => this.handleTick(link, node));
 		this.simulation.alpha(1).restart();
-	}
+  }
+
+  restartSimulation() {
+    if (!this.simulation) {
+      return;
+    }
+    this.simulation.alpha(1).restart();
+  }
 
 	handleTick(link: any, node: any) {
 		if (link) {
@@ -122,7 +127,7 @@ class VisualEditor extends Component<any, InternalState> {
 		}
 
 		node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
-}
+  }
 
 	onDragStarted(d: any) {
 		if (!d3.event.active) {
@@ -329,9 +334,7 @@ createLink(link: any) {
 
 		node.append('circle')
 			.attr("r", 30)
-			.attr('fill', '#0099cc')
-			.attr('stroke', '#237dac')
-			.attr('stroke-width', '2')
+			.attr('fill', '#6ce4d8');
 
 		node.append('text')
 			.attr('dy', '5')
@@ -365,7 +368,7 @@ createLink(link: any) {
 			}
 
 			node.select('circle')
-				.attr('stroke', '#0099cc')
+				.attr('stroke', '#6ce4d8')
 				.attr('stroke-width', '12')
 				.attr('stroke-opacity', '0.5');
 		});
@@ -377,24 +380,24 @@ createLink(link: any) {
 				return;
 			}
 
-			node.select('circle')
-				.attr('stroke', '#237dac')
-				.attr('stroke-width', '2')
-				.attr('stroke-opacity', '1');
+      node.select('circle')
+        .attr('stroke-width', 0);
 		});
 
 		node.on('click', function(d: any) {
 			const node: any = d3.select(this);
-			const circle = node.select('circle');
+      const circle = node.select('circle');
+
+      const selected = d3.selectAll('.node.selected')
+      self.removeButtonGroup(selected);
 
 			if (node._groups[0][0].classList.contains('selected')) {
-				circle.attr('stroke-width', '2')
-					.attr('stroke', '#237dac');
+				circle.attr('stroke-width', 0);
 				node.attr('class', 'node');
 				self.removeButtonGroup(node);
 			} else {
-				circle.attr('stroke-width', '12')
-					.attr('stroke', '#0099cc');
+				circle.attr('stroke-width', 12)
+					.attr('stroke', '#6ce4d8');
 				node.attr('class', 'node selected');
 				self.addButtonGroup(node);
 			}
@@ -437,7 +440,7 @@ createLink(link: any) {
 			.append('path')
 			.attr('class', (d: any, i: number) => `button action-${i}`)
 			.attr('d', (d: any) => arcButton(d))
-			.attr('fill', '#D2D5DA')
+			.attr('fill', '#D2D5D9')
 			.style('cursor', 'pointer')
 			.attr('stroke', '#f1f4f9')
 			.attr('stroke-width', 2)
@@ -469,11 +472,11 @@ createLink(link: any) {
 		buttonGroup.selectAll('.button')
 			.on('mouseenter', function() {
 				const button: any = d3.select(this);
-				button.attr('fill', '#0099cc');
+				button.attr('fill', '#CACACA');
 			})
 			.on('mouseleave', function() {
 				const button: any = d3.select(this);
-				button.attr('fill', '#D2D5DA');
+				button.attr('fill', '#D2D5D9');
 			})
 
 		buttonGroup.select('.button.action-0')
@@ -515,7 +518,7 @@ createLink(link: any) {
 	}
 
 	updateSimulation() {
-		const { links, nodes } = this.state;
+    const { links, nodes } = this.state;
 
 		// Update node
 		let node = d3.select('.nodes')
@@ -537,7 +540,6 @@ createLink(link: any) {
 			.on('tick', () => this.handleTick(link, node));
 		this.simulation.force('link').links(links);
 		this.simulation.alpha(1).restart();
-		this.clearSelectedNodes();
 	}
 
 	// Add new link
@@ -546,8 +548,8 @@ createLink(link: any) {
 	}
 
 	handleAddLinkOk() {
-    const { selectedNodes, newLink } = this.state;
-    console.log(selectedNodes, newLink);
+    const { newLink } = this.state;
+    console.log(newLink);
   }
 
   // Add link
@@ -588,12 +590,6 @@ createLink(link: any) {
 				relative: ''
 			},
 		});
-	}
-
-	clearSelectedNodes() {
-		d3.selectAll('.node.selected')
-				.attr('class', 'node');
-		this.setState({ selectedNodes: [] });
 	}
 
 	showAddNode() {
@@ -738,6 +734,7 @@ createLink(link: any) {
 			<Content className="visual-editor">
         <TopTools
           scale={scale}
+          restart={() => this.restartSimulation()}
           showAddNode={() => this.showAddNode()}
           />
 				<div className="visual-editor-container" id="Neo4jContainer"></div>

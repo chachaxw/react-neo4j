@@ -56,6 +56,8 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 ![React Neo4j With D3](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot2.png)
 👇
 ![React Neo4j With D3](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot3.png)
+👇
+![React Neo4j With D3](https://github.com/chachaxw/react-neo4j/blob/master/public/screen-shot4.png)
 
 ## References
 
