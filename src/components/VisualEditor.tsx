@@ -340,11 +340,10 @@ createLink(link: any) {
 			.attr('font-size', '11px')
 			.attr('text-anchor', 'middle')
 			.text((d: any) => {
-					if(d.name.length > 4){
-							const name = d.name.slice(0, 4) + '...';
-							return name;
+					if(d.name && d.name.length > 4){
+							return d.name.slice(0, 4) + '...';
 					}
-					return d.name;
+					return d.name ? d.name : '';
 			});
 
 		node.append("title").text((d: any) => d.name);
@@ -410,16 +409,16 @@ createLink(link: any) {
 
 	addArrowMarker(svg: any) {
 		const arrow = svg.append('marker')
-			.attr('id', 'ArrowMarker')
-			.attr('markerUnits', 'strokeWidth')
-			.attr('markerWidth', 18)
-			.attr('markerHeight', 18)
-			.attr('viewBox', '0 0 12 12')
-			.attr('refX', 30)
-			.attr('refY', 6)
-			.attr('orient', 'auto');
+      .attr('id', 'ArrowMarker')
+      .attr('markerUnits', 'strokeWidth')
+      .attr('markerWidth', '14')
+      .attr('markerHeight', '14')
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', '30')
+      .attr('refY', '0')
+      .attr('orient', 'auto');
+    const arrowPath = 'M0,-4 L10,0 L0,4';
 
-		const arrowPath = 'M2,2 L10,6 L2,10 L6,6 L2,2';
 		arrow.append('path').attr('d', arrowPath).attr('fill', '#A5ABB6');
 	}
 
@@ -541,23 +540,6 @@ createLink(link: any) {
 		this.clearSelectedNodes();
 	}
 
-	async removeNode(node: any) {
-    try {
-      const { nodes, links  } = this.state;
-      const removeLinks = links.filter(d => (d.source.id === node.id || d.target.id === node.id));
-
-      await Promise.all(removeLinks.map(async (d: any) => await ApiService.deleteLink(d.id)));
-      
-      this.setState({
-        nodes: nodes.filter(d => d.id !== node.id),
-        links: links.filter(d => (d.source.id !== node.id && d.target.id !== node.id)),
-      }, () => this.updateSimulation());
-      message.success('Remove Node Success');
-    } catch(err) {
-      message.error(err);
-    }
-	}
-
 	// Add new link
 	showAddLink() {
 		this.setState({ showAddLinkModal: true });
@@ -576,8 +558,8 @@ createLink(link: any) {
         target,
         relative,
       };
-      const res = await ApiService.postLink(link);
-      const links = this.state.links.concat([res]);
+      const { data } = await ApiService.postLink(link);
+      const links = this.state.links.concat([data]);
 
       this.setState({ links: this.formatLinks(links) }, () => this.updateSimulation());
       this.handleAddLinkCancel(false);
@@ -587,11 +569,11 @@ createLink(link: any) {
     }
   }
 
-	handleAddLinkChange(e: any) {
+	handleAddLinkChange(value: any) {
 		this.setState({
 			newLink: {
 				...this.state.newLink,
-				relative: e.target.value,
+				relative: value,
 			}
 		});
 	}
@@ -620,11 +602,12 @@ createLink(link: any) {
 
   // Add node
 	async handleAddNodeOk() {
-    try {
-      const { nodes, newNode } = this.state;
-      const res = await ApiService.postNode({ name: newNode.name });
+    const { nodes, newNode } = this.state;
 
-      this.setState({ nodes: nodes.concat([res]) }, () => this.updateSimulation());
+    try {
+      const { data } = await ApiService.postNode({ name: newNode.name });
+
+      this.setState({ nodes: nodes.concat([data]) }, () => this.updateSimulation());
       this.handleAddNodeCancel(false);
       message.success('Add Node Success');
     } catch(err) {
@@ -632,11 +615,9 @@ createLink(link: any) {
     }
 	}
 
-	handleAddNodeChange(e: any) {
+	handleAddNodeChange(value: any) {
 		this.setState({
-			newNode: {
-				name: e.target.value,
-			},
+			newNode: { name: value },
 		});
 	}
 
@@ -646,8 +627,9 @@ createLink(link: any) {
 
   // Update nodes list
 	async handleNodeOk() {
+    const { selectedNode } = this.state;
+
     try {
-      const { selectedNode } = this.state;
       await ApiService.patchNode(selectedNode.id, { name: selectedNode.name });
 
       const nodes = this.state.nodes.map((item) => {
@@ -656,7 +638,7 @@ createLink(link: any) {
         }
         return item;
       });
-  
+
       this.setState({ nodes }, () => this.updateSimulation());
       this.handleNodeCancel(false);
       message.success('Update Node Success');
@@ -665,8 +647,7 @@ createLink(link: any) {
     }
 	}
 
-	handleNodeChange(e: any) {
-		const value = e.target.value;
+	handleNodeChange(value: any) {
 		const { selectedNode } = this.state;
 		this.setState({
 			selectedNode: {
@@ -682,8 +663,9 @@ createLink(link: any) {
 
 	// Update links list
 	async handleLinkOk() {
+    const { selectedLink } = this.state;
+
     try {
-      const { selectedLink } = this.state;
       const { id, value, source, target, relative } = selectedLink;
       const params = {
         id,
@@ -710,8 +692,7 @@ createLink(link: any) {
     }
 	}
 
-	handleLinkChange(e: any) {
-		const value = e.target.value;
+	handleLinkChange(value: any) {
 		const { selectedLink } = this.state;
 		this.setState({
 			selectedLink: {
@@ -724,6 +705,26 @@ createLink(link: any) {
 	handleLinkCancel(visible: boolean) {
 		this.setState({ showLinkModal: visible });
   }
+
+  async removeNode(node: any) {
+    const { nodes, links  } = this.state;
+
+    try {
+      const removedNodes = nodes.filter(d => d.id === node.id);
+      const removedLinks = links.filter(d => (d.source.id === node.id || d.target.id === node.id));
+
+      await Promise.all(removedNodes.map(async (d: any) => await ApiService.deleteNode(d.id)));
+      await Promise.all(removedLinks.map(async (d: any) => await ApiService.deleteLink(d.id)));
+
+      this.setState({
+        nodes: nodes.filter(d => d.id !== node.id),
+        links: links.filter(d => (d.source.id !== node.id && d.target.id !== node.id)),
+      }, () => this.updateSimulation());
+      message.success('Remove Node Success');
+    } catch(err) {
+      message.error(err);
+    }
+	}
 
 	render() {
 		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,

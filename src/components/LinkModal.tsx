@@ -13,7 +13,7 @@ interface Props {
 export default function LinkModal(props: Props) {
 
   const { name, title, visible, onOk, onCancel, onChange } = props;
-  
+
   return (
     <Modal
       centered
@@ -22,9 +22,11 @@ export default function LinkModal(props: Props) {
       onOk={onOk}
       onCancel={() => onCancel(false)}
     >
-      <Form>
+      <Form layout="inline">
         <Form.Item label="节点关系">
-          <Input required value={name} onChange={(e) => onChange(e)} />
+          <Input required value={name} onChange={
+            (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)
+          } />
         </Form.Item>
       </Form>
     </Modal>
