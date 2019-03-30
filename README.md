@@ -61,7 +61,7 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## References
 
-[d3-force](https://github.com/d3/d3-force)
-[Force-Directed Graph](https://observablehq.com/@d3/force-directed-graph)
-[Disjoint Force-Directed Graph](https://observablehq.com/@d3/disjoint-force-directed-graph)
-[Using D3 with React and TypeScript](https://spin.atomicobject.com/2017/07/20/d3-react-typescript/)
+* [d3-force](https://github.com/d3/d3-force)
+* [Force-Directed Graph](https://observablehq.com/@d3/force-directed-graph)
+* [Disjoint Force-Directed Graph](https://observablehq.com/@d3/disjoint-force-directed-graph)
+* [Using D3 with React and TypeScript](https://spin.atomicobject.com/2017/07/20/d3-react-typescript/)

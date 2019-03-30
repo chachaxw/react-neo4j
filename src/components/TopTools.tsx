@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
-import { Button, Form, Tooltip, Icon, InputNumber } from 'antd';
+import { Button, Form, Tooltip, InputNumber } from 'antd';
+import SearchBar from './SearchBar';
 
 interface InternalProps {
   scale: number;
@@ -74,6 +75,9 @@ export default class TopTools extends Component<InternalProps, InternalState> {
           <Tooltip title="Restart" placement="bottom">
             <Button onClick={restart} shape="circle" icon="reload" type="primary" />
           </Tooltip>
+        </Form.Item>
+        <Form.Item>
+          <SearchBar />
         </Form.Item>
         <Form.Item>
           <InputNumber

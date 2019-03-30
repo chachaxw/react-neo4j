@@ -1,7 +1,7 @@
 import { Layout, Modal, message } from 'antd';
 import React, { Component } from 'react';
 import * as d3 from 'd3';
-import './VisualEditor.css';
+import './VisualEditor.scss';
 
 import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
@@ -494,7 +494,8 @@ createLink(link: any) {
 
 		buttonGroup.select('.button.action-2')
 			.on('click', (d) => {
-				console.log('Add', d);
+        console.log('Add', d);
+        this.showAddNode();
 			});
 
 		buttonGroup.select('.button.action-3')
