@@ -568,7 +568,7 @@ createLink(link: any) {
       this.handleAddLinkCancel(false);
       message.success('Add Link Success');
     } catch(err) {
-      message.error(err);
+      message.error(err.message);
     }
   }
 
@@ -608,7 +608,7 @@ createLink(link: any) {
       this.handleAddNodeCancel(false);
       message.success('Add Node Success');
     } catch(err) {
-      message.error(err);
+      message.error(err.message);
     }
 	}
 
@@ -640,7 +640,7 @@ createLink(link: any) {
       this.handleNodeCancel(false);
       message.success('Update Node Success');
     } catch(err) {
-      message.error(err);
+      message.error(err.message);
     }
 	}
 
@@ -685,7 +685,7 @@ createLink(link: any) {
       this.handleLinkCancel(false);
       message.success('Update Link Success');
     } catch(err) {
-      message.error(err);
+      message.error(err.message);
     }
 	}
 
@@ -719,7 +719,7 @@ createLink(link: any) {
       }, () => this.updateSimulation());
       message.success('Remove Node Success');
     } catch(err) {
-      message.error(err);
+      message.error(err.message);
     }
 	}
 

@@ -23,7 +23,7 @@
 
 .search-bar {
   position: relative;
-  top: 4px;
+  margin-top: 4px;
 	overflow: hidden;
 	height: 32px;
 
@@ -127,7 +127,6 @@
 		vertical-align: middle;
 		text-align: center;
 		font-size: 14px;
-		letter-spacing: 1px;
 		color: #438EF7;
 		pointer-events: none;
 		user-select: none;
