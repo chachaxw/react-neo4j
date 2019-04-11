@@ -65,7 +65,8 @@ export default class TopTools extends Component<InternalProps, InternalState> {
         <Form.Item>
           <Tooltip title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'} placement="bottom">
             <Button
-              shape="circle" type="primary"
+              shape="circle"
+              type="primary"
               icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
               onClick={() => this.setFullScreen()}
             />
@@ -86,8 +87,8 @@ export default class TopTools extends Component<InternalProps, InternalState> {
             step={15}
             value={scale}
             defaultValue={100}
-            formatter={value => `${value}%`}
-            parser={value => value ? Number(value.replace('%', '')) : 100}
+            formatter={(value: number) => `${value}%`}
+            parser={(value: string) => value ? Number(value.replace('%', '')) : 100}
           />
         </Form.Item>
       </Form>
