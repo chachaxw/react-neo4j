@@ -30,8 +30,8 @@
 
 	&.active {
 		&::before {
-			top: 14px;
-			bottom: 14px;
+			top: 8px;
+			bottom: 6px;
 			opacity: 0;
 		}
 
@@ -101,7 +101,7 @@
 		content: '';
 		position: absolute;
 		left: 50%;
-		top: 0;
+		top: 4px;
 		transform: translateX(-1px);
 		width: 2px;
 		background: #438EF7;
@@ -121,10 +121,10 @@
 		position: absolute;
 		top: 50%;
 		left: 0;
-		height: 40px;
-		line-height: 40px;
+		height: 32px;
+		line-height: 32px;
 		width: 100%;
-		margin-top: -20px;
+		margin-top: -16px;
 		vertical-align: middle;
 		text-align: center;
 		font-size: 14px;
@@ -140,11 +140,10 @@
 	p {
 	  position: absolute;
 	  top: 50%;
-	  left: -4px;
-	  height: 40px;
-	  line-height: 40px;
+	  height: 32px;
+	  line-height: 32px;
 	  width: 100%;
-	  margin-top: -20px;
+	  margin-top: -16px;
 	  vertical-align: middle;
 	  text-align: center;
 	  font-size: 14px;
@@ -167,10 +166,9 @@
 			content: '';
 			opacity: 0;
 			width: 2px;
-			height: 60px;
+			height: 28px;
 			vertical-align: middle;
 			border-radius: 20px;
-			margin-top: 8px;
 			transition: all .2s ease-in-out;
 			transition-delay: 1000ms;
 			display: inline-block;
@@ -178,8 +176,7 @@
 
 		&:after {
 			position: relative;
-			bottom: 8px;
-			left: 4px;
+			left: -1px;
 			background: #438EF7;
 			animation: blinky 450ms linear infinite alternate;
 		}
