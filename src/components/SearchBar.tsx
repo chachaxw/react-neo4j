@@ -1,14 +1,16 @@
-import React, { Component } from 'react';
+import React, { Component, FormEvent } from 'react';
 import classNames from 'classnames';
 
 interface InternalState {
-  trigger: boolean;
+  trigger: boolean | null;
+  value: string;
 }
 
 export default class SearchBar extends Component<any, InternalState> {
 
   readonly state = {
-    trigger: false,
+    trigger: null,
+    value: '',
   }
 
   handleClick() {
@@ -19,27 +21,26 @@ export default class SearchBar extends Component<any, InternalState> {
 
   handleBlur() {
     const search = document.querySelector('.search-bar');
-    this.setState({ trigger: false });
+    this.setState({ trigger: false, value: '' });
 
     if (!search) return;
 
     setTimeout(() => {
       search.classList.add('done');
-  
-      setTimeout(() => {
-        search.classList.remove('active', 'remove');
 
-        // setTimeout(() => {
-        //   search.classList.remove('done');
-        //   this.setState({ trigger: true });
-        // }, 100);
+      setTimeout(() => {
+        setTimeout(() => {
+          search.classList.remove('done');
+          this.setState({ trigger: null });
+          search.classList.remove('remove');
+        }, 100);
       }, 100);
     }, 800);
   }
 
   render() {
-    const { trigger } = this.state;
-    const cls = classNames('search-bar', { 'active': trigger }, { 'remove': !trigger });
+    const { trigger, value } = this.state;
+    const cls = classNames('search-bar', { 'active': trigger, 'remove': trigger === false });
 
     return (
       <div className={cls} onClick={() => this.handleClick()}>
@@ -58,8 +59,12 @@ export default class SearchBar extends Component<any, InternalState> {
             d="M177.75 85.99H44.25C20.916 85.99 2 67.074 2 43.74 2.556 20.528 21.533 2 44.752 2H177.75"/>
         </svg>
 
-        <p></p>
-        <input type="text" className={trigger ? 'active' : 'remove'} onBlur={() => this.handleBlur()} />
+        <p>{value}</p>
+        <input
+          type="text"
+          onBlur={() => this.handleBlur()}
+          onChange={(e: FormEvent<HTMLInputElement>) => this.setState({ value: e.currentTarget.value })}
+        />
 
         <span>Search</span>
       </div>

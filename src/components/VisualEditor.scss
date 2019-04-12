@@ -52,47 +52,47 @@
 			transform: scale(0);
 			opacity: 0;
 		}
+	}
 
-		&.remove {
-			&::before {
-				transition: all 200ms linear 200ms, opacity 0ms linear 0ms;
-				top: 40px;
-				bottom: 2px;
-				opacity: 1;
+	&.remove {
+		&::before {
+			transition: all 200ms linear 200ms, opacity 0ms linear 0ms;
+			top: 40px;
+			bottom: 2px;
+			opacity: 1;
+		}
+
+		p {
+			&::before,
+			&::after {
+				transition: all 0ms;
+				opacity: 0;
 			}
+		}
 
-			p {
-				&::before,
-				&::after {
-					transition: all 0ms;
-					opacity: 0;
-				}
+		path {
+			stroke-dashoffset: -800;
+			transition-delay: 400ms;
+		}
+
+		span {
+			transform: scale(1);
+			opacity: 1;
+			transition-delay: 400ms;
+		}
+
+		&.done {
+			&::before {
+				top: 0;
+				bottom: 40px;
+				opacity: 1;
+				transition: none;
 			}
 
 			path {
-				stroke-dashoffset: -800;
-				transition-delay: 400ms;
-			}
-
-			span {
-				transform: scale(1);
-				opacity: 1;
-				transition-delay: 400ms;
-			}
-
-			&.done {
-				&::before {
-					top: 0;
-					bottom: 40px;
-					opacity: 1;
-					transition: none;
-				}
-
-				path {
-					stroke-dashoffset: 0;
-					stroke-dasharray: 400;
-					transition: none;
-				}
+				stroke-dashoffset: 0;
+				stroke-dasharray: 400;
+				transition: none;
 			}
 		}
 	}
@@ -139,11 +139,9 @@
 	input,
 	p {
 	  position: absolute;
-	  top: 50%;
 	  height: 32px;
 	  line-height: 32px;
 	  width: 100%;
-	  margin-top: -16px;
 	  vertical-align: middle;
 	  text-align: center;
 	  font-size: 14px;
