@@ -4,7 +4,6 @@ import SearchBar from './SearchBar';
 
 interface InternalProps {
   scale: number;
-  restart: () => void;
   showAddNode: () => void;
 }
 
@@ -53,7 +52,7 @@ export default class TopTools extends Component<InternalProps, InternalState> {
 
   render() {
     const { isFullScreen } = this.state;
-    const { restart, scale, showAddNode } = this.props;
+    const { scale, showAddNode } = this.props;
 
     return (
       <Form layout="inline" className="visual-editor-tools">
@@ -70,11 +69,6 @@ export default class TopTools extends Component<InternalProps, InternalState> {
               icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
               onClick={() => this.setFullScreen()}
             />
-          </Tooltip>
-        </Form.Item>
-        <Form.Item>
-          <Tooltip title="Restart" placement="bottom">
-            <Button onClick={restart} shape="circle" icon="reload" type="primary" />
           </Tooltip>
         </Form.Item>
         <Form.Item>

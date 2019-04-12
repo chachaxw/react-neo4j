@@ -1,5 +1,5 @@
 import { Layout, Modal, message } from 'antd';
-import React, { Component } from 'react';
+import React, { Component, SyntheticEvent } from 'react';
 import * as d3 from 'd3';
 import './VisualEditor.scss';
 
@@ -76,9 +76,9 @@ class VisualEditor extends Component<any, InternalState> {
 
 		this.setState({	loading: false, nodes, links }, () => {
       const el = document.getElementById('Neo4jContainer');
-      this.initSimulation(el, nodes, this.formatLinks(links));
+      this.initSimulation(el!, nodes, this.formatLinks(links));
     });
-	}
+  }
 
 	initSimulation(el: any, nodes: any[], links: any[]) {
 
@@ -110,10 +110,13 @@ class VisualEditor extends Component<any, InternalState> {
 		this.simulation.alpha(1).restart();
   }
 
-  restartSimulation() {
+  restartSimulation(e: SyntheticEvent) {
+    e.stopPropagation();
+
     if (!this.simulation) {
       return;
     }
+
     this.simulation.alpha(1).restart();
   }
 
@@ -735,10 +738,13 @@ createLink(link: any) {
 			<Content className="visual-editor">
         <TopTools
           scale={scale}
-          restart={() => this.restartSimulation()}
           showAddNode={() => this.showAddNode()}
           />
-				<div className="visual-editor-container" id="Neo4jContainer"></div>
+        <div
+          id="Neo4jContainer"
+          className="visual-editor-container"
+          onClick={(e: SyntheticEvent) => this.restartSimulation(e)}>
+        </div>
 				<NodeModal
 					title="添加节点"
 					visible={showAddNodeModal}

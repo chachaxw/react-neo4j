@@ -62,6 +62,7 @@ export default class SearchBar extends Component<any, InternalState> {
         <p>{value}</p>
         <input
           type="text"
+          value={value}
           onBlur={() => this.handleBlur()}
           onChange={(e: FormEvent<HTMLInputElement>) => this.setState({ value: e.currentTarget.value })}
         />

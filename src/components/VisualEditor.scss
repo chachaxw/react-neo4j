@@ -21,17 +21,21 @@
   border-radius: 4px;
 }
 
+// Search bar variables
+$searchHeight: 40px;
+$inputHeight: 32px;
+
 .search-bar {
 	display: flex;
 	align-items: center;
   position: relative;
 	overflow: hidden;
-	height: 40px;
+	height: $searchHeight;
 
 	&.active {
 		&::before {
-			top: 8px;
-			bottom: 6px;
+			top: 7px;
+			bottom: 4px;
 			opacity: 0;
 		}
 
@@ -57,7 +61,7 @@
 	&.remove {
 		&::before {
 			transition: all 200ms linear 200ms, opacity 0ms linear 0ms;
-			top: 40px;
+			top: $searchHeight;
 			bottom: 2px;
 			opacity: 1;
 		}
@@ -84,7 +88,7 @@
 		&.done {
 			&::before {
 				top: 0;
-				bottom: 40px;
+				bottom: $searchHeight;
 				opacity: 1;
 				transition: none;
 			}
@@ -105,7 +109,7 @@
 		transform: translateX(-1px);
 		width: 2px;
 		background: #438EF7;
-		bottom: 40px;
+		bottom: $searchHeight;
 		border-radius: 16px;
 		opacity: 1;
 		transition: all 400ms ease-in-out 500ms, opacity 200ms linear 1000ms;
@@ -119,12 +123,10 @@
 
 	span {
 		position: absolute;
-		top: 50%;
 		left: 0;
-		height: 32px;
-		line-height: 32px;
+		height: $inputHeight;
+		line-height: $inputHeight;
 		width: 100%;
-		margin-top: -16px;
 		vertical-align: middle;
 		text-align: center;
 		font-size: 14px;
@@ -139,8 +141,8 @@
 	input,
 	p {
 	  position: absolute;
-	  height: 32px;
-	  line-height: 32px;
+	  height: $inputHeight;
+	  line-height: $inputHeight;
 	  width: 100%;
 	  vertical-align: middle;
 	  text-align: center;
