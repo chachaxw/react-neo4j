@@ -496,23 +496,17 @@ createLink(link: any) {
 			});
 
 		buttonGroup.select('.button.action-2')
-			.on('click', (d) => {
-        console.log('Add', d);
-        this.showAddNode();
-			});
+			.on('click', (d) => this.showAddNode());
 
 		buttonGroup.select('.button.action-3')
-			.on('click', (d) => {
-				console.log('Link', d);
-			});
+			.on('click', (d) => this.showAddLink());
 
 		buttonGroup.select('.button.action-4')
-			.on('click', (d) => {
+			.on('click', (d: any) => {
 				confirm({
-					title: '确定删除该节点？',
-					onOk: () => {
-							this.removeNode(d);
-					},
+          centered: true,
+					title: `Do you want to delete ${d.name}?`,
+					onOk: () => this.removeNode(d),
 				});
 			});
 	}
@@ -750,7 +744,7 @@ createLink(link: any) {
 					visible={showAddNodeModal}
 					name={newNode.name}
 					onOk={() => this.handleAddNodeOk()}
-					onChange={(e) => this.handleAddNodeChange(e)}
+					onChange={(e: SyntheticEvent) => this.handleAddNodeChange(e)}
 					onCancel={(visible: boolean) => this.handleAddNodeCancel(visible)}
 				/>
 				<NodeModal
@@ -758,7 +752,7 @@ createLink(link: any) {
 					visible={showNodeModal}
 					name={selectedNode.name}
 					onOk={() => this.handleNodeOk()}
-					onChange={(e) => this.handleNodeChange(e)}
+					onChange={(e: SyntheticEvent) => this.handleNodeChange(e)}
 					onCancel={(visible: boolean) => this.handleNodeCancel(visible)}
 				/>
 				<LinkModal
@@ -766,7 +760,7 @@ createLink(link: any) {
 					visible={showAddLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleAddLinkOk()}
-					onChange={(e: any) => this.handleAddLinkChange(e)}
+					onChange={(e: SyntheticEvent) => this.handleAddLinkChange(e)}
 					onCancel={(visible: boolean) => this.handleAddLinkCancel(visible)}
 				/>
 				<LinkModal
@@ -774,7 +768,7 @@ createLink(link: any) {
 					visible={showLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleLinkOk()}
-					onChange={(e) => this.handleLinkChange(e)}
+					onChange={(e: SyntheticEvent) => this.handleLinkChange(e)}
 					onCancel={(visible: boolean) => this.handleLinkCancel(visible)}
 				/>
 			</Content>
