@@ -46,7 +46,7 @@
       false,
       "allow-empty-catch"
     ],
-    "no-trailing-whitespace": [// 不允许空格结尾
+    "no-trailing-whitespace": [
       true,
       "ignore-comments",
       "ignore-jsdoc"

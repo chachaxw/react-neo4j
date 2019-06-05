@@ -35,7 +35,6 @@ class DrawerTools extends Component<InternalProps, InternalState> {
         onClose={this.onClose}
         visible={this.state.visible}
       >
-
       </Drawer>
     );
   }
