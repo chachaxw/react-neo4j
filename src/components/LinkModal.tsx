@@ -1,5 +1,5 @@
-import React from 'react';
 import { Form, Input, Modal } from 'antd';
+import React, { FC } from 'react';
 
 interface Props {
   name: string;
@@ -10,7 +10,7 @@ interface Props {
   onChange: (e: any) => void;
 }
 
-export default function LinkModal(props: Props) {
+export const LinkModal: FC<Props> = (props) => {
 
   const { name, title, visible, onOk, onCancel, onChange } = props;
 
@@ -31,4 +31,6 @@ export default function LinkModal(props: Props) {
       </Form>
     </Modal>
   );
-}
+};
+
+export default LinkModal;

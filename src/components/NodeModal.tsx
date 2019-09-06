@@ -1,37 +1,60 @@
 import { Form, Input, Modal } from 'antd';
+import { FormComponentProps } from 'antd/lib/form';
 import React, { FC } from 'react';
 
-interface Props {
+import { Node } from './types';
+
+interface Props extends FormComponentProps {
   name: string;
   title: string;
   loading: boolean;
   visible: boolean;
-  onOk: () => void;
+  onOk: (node: Node) => void;
   onCancel: (visible: boolean) => void;
-  onChange: (e: any) => void;
 }
 
  export const NodeModal: FC<Props> = (props) => {
-  const { name, title, visible, loading, onOk, onCancel, onChange } = props;
+  const { name, title, visible, loading, onOk, onCancel, form } = props;
+  const { getFieldDecorator, validateFields, resetFields } = form;
+
+  const handleOk = (e: any) => {
+    e.preventDefault();
+
+    validateFields((err: any, values: any) => {
+      if (!err) {
+        onOk(values);
+      }
+    });
+  };
+
+  const handleCancel = () => {
+    resetFields();
+    onCancel(false);
+  };
 
   return (
     <Modal
       centered
-      onOk={onOk}
       title={title}
+      onOk={handleOk}
       visible={visible}
       confirmLoading={loading}
-      onCancel={() => onCancel(false)}
+      onCancel={handleCancel}
     >
       <Form>
         <Form.Item label="Node Name">
-          <Input required value={name} onChange={
-            (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)
-          } />
+          {getFieldDecorator('name', {
+            initialValue: name,
+            rules: [
+              { required: true, message: 'Please input node name!' },
+            ],
+          })(
+            <Input placeholder="Node name" />
+          )}
         </Form.Item>
       </Form>
     </Modal>
   );
 }
 
-export default NodeModal;
+export default Form.create()(NodeModal);

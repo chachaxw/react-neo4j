@@ -7,25 +7,12 @@ import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
 import Loading from './Loading';
 import TopTools from './TopTools';
+import { Node, Link } from './types';
 import { sortBy } from '../utils/utils';
 import { ApiService } from '../services/ApiService';
 
 const { confirm } = Modal;
 const { Content } = Layout;
-
-interface Node {
-	id?: number | string;
-  name: string;
-  [key: string]: any;
-}
-
-interface Link {
-	id?: number | string;
-	source: number | string | object | null;
-	target: number | string | object | null;
-  relative: string;
-  [key: string]: any;
-}
 
 interface InternalState {
   loading: boolean;
@@ -601,12 +588,12 @@ createLink(link: any) {
 	}
 
   // Add node
-	async handleAddNodeOk() {
-    const { nodes, newNode } = this.state;
+	async handleAddNodeOk(node: Node) {
+    const { nodes } = this.state;
 
     try {
       this.setState({ addNodeLoading: true });
-      const { data } = await ApiService.postNode({ name: newNode.name });
+      const { data } = await ApiService.postNode(node);
 
       this.setState({
         nodes: nodes.concat([data]),
@@ -620,51 +607,43 @@ createLink(link: any) {
     }
 	}
 
-	handleAddNodeChange(value: any) {
-		this.setState({
-			newNode: { name: value },
-		});
-	}
-
 	handleAddNodeCancel(visible: boolean) {
 		this.setState({ showAddNodeModal: visible });
 	}
 
   // Update nodes list
-	async handleNodeOk() {
+	async handleNodeOk(node: Node) {
     const { selectedNode } = this.state;
 
     try {
       this.setState({ editNodeLoading: true });
-      await ApiService.patchNode(selectedNode.id, { name: selectedNode.name });
+      await ApiService.patchNode(selectedNode.id, node);
 
       const nodes = this.state.nodes.map((item) => {
         if(item.id === selectedNode.id) {
-          return selectedNode;
+          return {
+            ...selectedNode,
+            ...node,
+          };
         }
         return item;
       });
 
       this.setState({
         nodes,
+        selectedNode: {
+          ...selectedNode,
+          ...node,
+        },
         editNodeLoading: false,
       }, () => this.updateSimulation());
       this.handleNodeCancel(false);
+
       message.success('Update Node Success');
     } catch(err) {
       this.setState({ editNodeLoading: false });
       message.error(err.message);
     }
-	}
-
-	handleNodeChange(value: any) {
-		const { selectedNode } = this.state;
-		this.setState({
-			selectedNode: {
-				...selectedNode,
-				name: value,
-			},
-		});
 	}
 
 	handleNodeCancel(visible: boolean) {
@@ -760,8 +739,7 @@ createLink(link: any) {
           name={newNode.name}
           loading={addNodeLoading}
 					visible={showAddNodeModal}
-					onOk={() => this.handleAddNodeOk()}
-					onChange={(e: SyntheticEvent) => this.handleAddNodeChange(e)}
+					onOk={(node: Node) => this.handleAddNodeOk(node)}
 					onCancel={(visible: boolean) => this.handleAddNodeCancel(visible)}
 				/>
 				<NodeModal
@@ -769,8 +747,7 @@ createLink(link: any) {
 					visible={showNodeModal}
           name={selectedNode.name}
           loading={editNodeLoading}
-					onOk={() => this.handleNodeOk()}
-					onChange={(e: SyntheticEvent) => this.handleNodeChange(e)}
+					onOk={(node: Node) => this.handleNodeOk(node)}
 					onCancel={(visible: boolean) => this.handleNodeCancel(visible)}
 				/>
 				<LinkModal
