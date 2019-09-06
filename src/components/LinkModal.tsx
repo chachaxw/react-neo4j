@@ -22,8 +22,8 @@ export default function LinkModal(props: Props) {
       onOk={onOk}
       onCancel={() => onCancel(false)}
     >
-      <Form layout="inline">
-        <Form.Item label="节点关系">
+      <Form>
+        <Form.Item label="Link Name">
           <Input required value={name} onChange={
             (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)
           } />

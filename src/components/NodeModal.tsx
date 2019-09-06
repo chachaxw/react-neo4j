@@ -1,29 +1,30 @@
-import React from 'react';
 import { Form, Input, Modal } from 'antd';
+import React, { FC } from 'react';
 
 interface Props {
   name: string;
   title: string;
+  loading: boolean;
   visible: boolean;
   onOk: () => void;
   onCancel: (visible: boolean) => void;
   onChange: (e: any) => void;
 }
 
-export default function NodeModal(props: Props) {
-
-  const { name, title, visible, onOk, onCancel, onChange } = props;
+ export const NodeModal: FC<Props> = (props) => {
+  const { name, title, visible, loading, onOk, onCancel, onChange } = props;
 
   return (
     <Modal
       centered
+      onOk={onOk}
       title={title}
       visible={visible}
-      onOk={onOk}
+      confirmLoading={loading}
       onCancel={() => onCancel(false)}
     >
-      <Form layout="inline">
-        <Form.Item label="节点名称">
+      <Form>
+        <Form.Item label="Node Name">
           <Input required value={name} onChange={
             (e: React.ChangeEvent<HTMLInputElement>) => onChange(e.target.value)
           } />
@@ -32,3 +33,5 @@ export default function NodeModal(props: Props) {
     </Modal>
   );
 }
+
+export default NodeModal;

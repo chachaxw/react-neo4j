@@ -6,27 +6,31 @@ import './VisualEditor.scss';
 import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
 import Loading from './Loading';
+import TopTools from './TopTools';
 import { sortBy } from '../utils/utils';
 import { ApiService } from '../services/ApiService';
-import TopTools from './TopTools';
 
 const { confirm } = Modal;
 const { Content } = Layout;
 
 interface Node {
 	id?: number | string;
-	name: string;
+  name: string;
+  [key: string]: any;
 }
 
 interface Link {
 	id?: number | string;
 	source: number | string | object | null;
 	target: number | string | object | null;
-	relative: string;
+  relative: string;
+  [key: string]: any;
 }
 
 interface InternalState {
-	loading: boolean;
+  loading: boolean;
+  addNodeLoading: boolean;
+  editNodeLoading: boolean;
 	showAddLinkModal: boolean;
 	showAddNodeModal: boolean;
 	showNodeModal: boolean;
@@ -48,12 +52,14 @@ class VisualEditor extends Component<any, InternalState> {
 
 		this.state = {
       loading: true,
+			selectedNode: {},
+			selectedLink: {},
+      addNodeLoading: false,
+      editNodeLoading: false,
 			showAddLinkModal: false,
 			showAddNodeModal: false,
 			showNodeModal: false,
 			showLinkModal: false,
-			selectedNode: {},
-			selectedLink: {},
 			newNode: {
 				id: 0,
 				name: '',
@@ -459,8 +465,8 @@ createLink(link: any) {
 			.attr('fill', '#fff')
 			.attr('pointer-events', 'none')
 			.attr('font-size', 11)
-			.text(function(d: any, i: number) {
-				const actions = ['编辑', '展开', '追加', '连线', '删除'];
+			.text((d: any, i: number) => {
+				const actions = ['Edit', 'Expand', 'Add', 'Link', 'Delete'];
 				return actions[i];
 			});
 
@@ -506,7 +512,7 @@ createLink(link: any) {
 				confirm({
           centered: true,
 					title: `Do you want to delete ${d.name}?`,
-					onOk: () => this.removeNode(d),
+					onOk: async () => await this.removeNode(d),
 				});
 			});
 	}
@@ -517,19 +523,19 @@ createLink(link: any) {
 
 	updateSimulation() {
     const { links, nodes } = this.state;
+    const nodesEl = d3.select('.nodes');
+    const linksEl = d3.select('.links');
 
 		// Update node
-		let node = d3.select('.nodes')
-			.selectAll('.node')
-			.data(nodes, d => d);
+		let node = nodesEl.selectAll('.node')
+			.data(nodes, (d: any) => d);
 		node.exit().remove();
 		const nodeEnter = this.createNode(node);
 		node = nodeEnter.merge(node);
 
 		// Update link
-		let link = d3.select('.links')
-			.selectAll('.link')
-			.data(links, d => d);
+		let link = linksEl.selectAll('.link')
+			.data(links, (d: any) => d);
 		link.exit().remove();
 		const linkEnter = this.createLink(link);
 		link = linkEnter.merge(link);
@@ -599,12 +605,17 @@ createLink(link: any) {
     const { nodes, newNode } = this.state;
 
     try {
+      this.setState({ addNodeLoading: true });
       const { data } = await ApiService.postNode({ name: newNode.name });
 
-      this.setState({ nodes: nodes.concat([data]) }, () => this.updateSimulation());
+      this.setState({
+        nodes: nodes.concat([data]),
+        addNodeLoading: false,
+      }, () => this.updateSimulation());
       this.handleAddNodeCancel(false);
       message.success('Add Node Success');
     } catch(err) {
+      this.setState({ addNodeLoading: false });
       message.error(err.message);
     }
 	}
@@ -624,6 +635,7 @@ createLink(link: any) {
     const { selectedNode } = this.state;
 
     try {
+      this.setState({ editNodeLoading: true });
       await ApiService.patchNode(selectedNode.id, { name: selectedNode.name });
 
       const nodes = this.state.nodes.map((item) => {
@@ -633,10 +645,14 @@ createLink(link: any) {
         return item;
       });
 
-      this.setState({ nodes }, () => this.updateSimulation());
+      this.setState({
+        nodes,
+        editNodeLoading: false,
+      }, () => this.updateSimulation());
       this.handleNodeCancel(false);
       message.success('Update Node Success');
     } catch(err) {
+      this.setState({ editNodeLoading: false });
       message.error(err.message);
     }
 	}
@@ -722,7 +738,7 @@ createLink(link: any) {
 
 	render() {
 		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,
-			newNode, selectedNode, selectedLink, scale } = this.state;
+			newNode, selectedNode, selectedLink, scale, addNodeLoading, editNodeLoading } = this.state;
 
 		if (this.state.loading) {
 			return <Loading />;
@@ -740,23 +756,25 @@ createLink(link: any) {
           onClick={(e: SyntheticEvent) => this.restartSimulation(e)}>
         </div>
 				<NodeModal
-					title="添加节点"
+					title="Add Node"
+          name={newNode.name}
+          loading={addNodeLoading}
 					visible={showAddNodeModal}
-					name={newNode.name}
 					onOk={() => this.handleAddNodeOk()}
 					onChange={(e: SyntheticEvent) => this.handleAddNodeChange(e)}
 					onCancel={(visible: boolean) => this.handleAddNodeCancel(visible)}
 				/>
 				<NodeModal
-					title="编辑节点"
+					title="Edit Node"
 					visible={showNodeModal}
-					name={selectedNode.name}
+          name={selectedNode.name}
+          loading={editNodeLoading}
 					onOk={() => this.handleNodeOk()}
 					onChange={(e: SyntheticEvent) => this.handleNodeChange(e)}
 					onCancel={(visible: boolean) => this.handleNodeCancel(visible)}
 				/>
 				<LinkModal
-					title="添加节点关系"
+					title="Add Link"
 					visible={showAddLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleAddLinkOk()}
@@ -764,7 +782,7 @@ createLink(link: any) {
 					onCancel={(visible: boolean) => this.handleAddLinkCancel(visible)}
 				/>
 				<LinkModal
-					title="编辑节点关系"
+					title="Edit Link"
 					visible={showLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleLinkOk()}
