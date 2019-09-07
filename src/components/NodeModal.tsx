@@ -5,7 +5,7 @@ import React, { FC } from 'react';
 import { Node } from './types';
 
 interface Props extends FormComponentProps {
-  name: string;
+  name?: string;
   title: string;
   loading: boolean;
   visible: boolean;

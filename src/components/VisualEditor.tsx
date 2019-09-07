@@ -336,7 +336,7 @@ createLink(link: any) {
 			.attr('dy', '5')
 			.attr('fill', '#ffffff')
 			.attr('pointer-events', 'none')
-			.attr('font-size', '11px')
+			.attr('font-size', '12px')
 			.attr('text-anchor', 'middle')
 			.text((d: any) => {
 					if(d.name && d.name.length > 4){
@@ -717,7 +717,7 @@ createLink(link: any) {
 
 	render() {
 		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,
-			newNode, selectedNode, selectedLink, scale, addNodeLoading, editNodeLoading } = this.state;
+			selectedNode, selectedLink, scale, addNodeLoading, editNodeLoading } = this.state;
 
 		if (this.state.loading) {
 			return <Loading />;
@@ -736,7 +736,6 @@ createLink(link: any) {
         </div>
 				<NodeModal
 					title="Add Node"
-          name={newNode.name}
           loading={addNodeLoading}
 					visible={showAddNodeModal}
 					onOk={(node: Node) => this.handleAddNodeOk(node)}
