@@ -15,13 +15,15 @@ interface Props extends FormComponentProps {
 export const LinkModal: FC<Props> = (props) => {
   const { name, title, visible, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
+  const buttonProps = { shape: 'round' };
 
   const handleOk = (e: any) => {
     e.preventDefault();
 
-    validateFields((err: any, values: any) => {
+    validateFields(async (err: any, values: any) => {
       if (!err) {
-        onOk(values);
+        await onOk(values);
+        resetFields();
       }
     });
   };
@@ -38,17 +40,15 @@ export const LinkModal: FC<Props> = (props) => {
       visible={visible}
       onOk={handleOk}
       onCancel={handleCancel}
+      okButtonProps={buttonProps}
+      cancelButtonProps={buttonProps}
     >
       <Form>
         <Form.Item label="Link Name">
-        {getFieldDecorator('name', {
+          {getFieldDecorator('name', {
             initialValue: name,
-            rules: [
-              { required: true, message: 'Please input link name!' },
-            ],
-          })(
-            <Input placeholder="Link name" />
-          )}
+            rules: [{ required: true, message: 'Please input link name!' }],
+          })(<Input placeholder="Link name" />)}
         </Form.Item>
       </Form>
     </Modal>

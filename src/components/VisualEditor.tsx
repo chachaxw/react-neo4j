@@ -1,21 +1,23 @@
 import { Layout, Modal, message } from 'antd';
 import React, { Component, SyntheticEvent } from 'react';
 import * as d3 from 'd3';
-import './VisualEditor.scss';
 
 import NodeModal from './NodeModal';
 import LinkModal from './LinkModal';
 import Loading from './Loading';
 import TopTools from './TopTools';
+import DrawerTools from './DrawerTools';
 import { Node, Link } from './types';
 import { sortBy } from '../utils/utils';
 import { ApiService } from '../services/ApiService';
+import './VisualEditor.scss';
 
 const { confirm } = Modal;
 const { Content } = Layout;
 
 interface InternalState {
   loading: boolean;
+  showDrawerTools: boolean;
   addNodeLoading: boolean;
   editNodeLoading: boolean;
 	showAddLinkModal: boolean;
@@ -40,7 +42,8 @@ class VisualEditor extends Component<any, InternalState> {
 		this.state = {
       loading: true,
 			selectedNode: {},
-			selectedLink: {},
+      selectedLink: {},
+      showDrawerTools: false,
       addNodeLoading: false,
       editNodeLoading: false,
 			showAddLinkModal: false,
@@ -63,7 +66,7 @@ class VisualEditor extends Component<any, InternalState> {
 		}
 	}
 
-	async componentDidMount() {
+	public async componentDidMount() {
 		const {data: nodes} = await ApiService.fetchNodes();
 		const {data: links} = await ApiService.fetchLinks();
 
@@ -73,7 +76,7 @@ class VisualEditor extends Component<any, InternalState> {
     });
   }
 
-	initSimulation(el: any, nodes: any[], links: any[]) {
+	public initSimulation(el: any, nodes: any[], links: any[]) {
 
 		if (!el) {
 			return;
@@ -103,7 +106,7 @@ class VisualEditor extends Component<any, InternalState> {
 		this.simulation.alpha(1).restart();
   }
 
-  restartSimulation(e: SyntheticEvent) {
+  public restartSimulation(e: SyntheticEvent) {
     e.stopPropagation();
 
     if (!this.simulation) {
@@ -113,7 +116,7 @@ class VisualEditor extends Component<any, InternalState> {
     this.simulation.alpha(1).restart();
   }
 
-	handleTick(link: any, node: any) {
+	public handleTick(link: any, node: any) {
 		if (link) {
 			link.selectAll('.outline')
 			.attr('d', (d: any) => this.linkArc(d));
@@ -125,7 +128,7 @@ class VisualEditor extends Component<any, InternalState> {
 		node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
   }
 
-	onDragStarted(d: any) {
+	public onDragStarted(d: any) {
 		if (!d3.event.active) {
 			this.simulation.alphaTarget(0.3).restart();
 		}
@@ -133,18 +136,18 @@ class VisualEditor extends Component<any, InternalState> {
 		d.fy = d.y;
 	}
 
-	onDragged(d: any) {
+	public onDragged(d: any) {
 		d.fx = d3.event.x;
 		d.fy = d3.event.y;
 	}
 
-	onDragEnded(d: any) {
+	public onDragEnded(d: any) {
 		if (!d3.event.active) {
 			this.simulation.alphaTarget(0);
 		}
 	}
 
-	onZoom(svg: any) {
+	public onZoom(svg: any) {
 		// 鼠标滚轮缩放
 		svg.call(d3.zoom().on('zoom', () => {
       const { transform } = d3.event;
@@ -160,7 +163,7 @@ class VisualEditor extends Component<any, InternalState> {
 		svg.on('dblclick.zoom', null); // 静止双击缩放
 	}
 
-	formatLinks(links: any[]) {
+	public formatLinks(links: any[]) {
 		if (!links || !(links && links.length > 0)) {
 			return [];
 		}
@@ -191,7 +194,7 @@ class VisualEditor extends Component<any, InternalState> {
 		return links;
 	}
 
-	initLinks(links: any, svg: any) {
+	public initLinks(links: any, svg: any) {
 		const link = svg.append('g')
 			.attr('class', 'layer links')
 			.selectAll('path.outline')
@@ -200,7 +203,7 @@ class VisualEditor extends Component<any, InternalState> {
 		return this.createLink(link);
 	}
 
-createLink(link: any) {
+  public createLink(link: any) {
 
 		if(!link || (link && !link._enter)) {
 				return;
@@ -246,7 +249,7 @@ createLink(link: any) {
 		return link;
 	}
 
-	initLinkEvent(link: any) {
+	public initLinkEvent(link: any) {
 		const self = this;
 
 		link.on('mouseenter', function() {
@@ -290,7 +293,7 @@ createLink(link: any) {
 		});
 	}
 
-	linkArc(d: any) {
+	public linkArc(d: any) {
 		const dx = (d.target.x - d.source.x);
 		const dy = (d.target.y - d.source.y);
 		const dr = Math.sqrt(dx * dx + dy * dy);
@@ -305,11 +308,11 @@ createLink(link: any) {
 		return `M${d.source.x},${d.source.y}A${arc},${arc} 0 0,${d.sameArcDirection} ${d.target.x},${d.target.y}`;
   }
 
-  drawLink() {
+  public drawLink() {
     console.log('Draw Link');
   }
 
-	initNodes(nodes: any, svg: any) {
+	public initNodes(nodes: any, svg: any) {
 		const node = svg.append('g')
 			.attr('class', 'layer nodes')
 			.selectAll('.node')
@@ -318,7 +321,7 @@ createLink(link: any) {
 		return this.createNode(node);
 	}
 
-	createNode(node: any) {
+	public createNode(node: any) {
 		node = node.enter()
 			.append('g')
 			.attr('class', 'node')
@@ -353,7 +356,7 @@ createLink(link: any) {
 		return node;
 	}
 
-	initNodeEvent(node: any) {
+	public initNodeEvent(node: any) {
 		const self = this;
 
 		node.on('mouseenter', function() {
@@ -384,7 +387,8 @@ createLink(link: any) {
 			const node: any = d3.select(this);
       const circle = node.select('circle');
 
-      const selected = d3.selectAll('.node.selected')
+      const selected = d3.selectAll('.node.selected');
+
       self.removeButtonGroup(selected);
 
 			if (node._groups[0][0].classList.contains('selected')) {
@@ -398,7 +402,7 @@ createLink(link: any) {
 				self.addButtonGroup(node);
 			}
 
-			self.setState({ selectedNode: d });
+			self.setState({ selectedNode: d, showDrawerTools: true });
 		});
 
 		node.on('dblclick', function() {
@@ -406,7 +410,7 @@ createLink(link: any) {
 		});
 	}
 
-	addArrowMarker(svg: any) {
+	public addArrowMarker(svg: any) {
 		const arrow = svg.append('marker')
       .attr('id', 'ArrowMarker')
       .attr('markerUnits', 'strokeWidth')
@@ -421,7 +425,7 @@ createLink(link: any) {
 		arrow.append('path').attr('d', arrowPath).attr('fill', '#A5ABB6');
 	}
 
-	addButtonGroup(node: any) {
+	public addButtonGroup(node: any) {
 		const data = [1, 1, 1, 1, 1];
 		const buttonGroup = node.append('g')
 			.attr('id', 'buttonGroup');
@@ -462,7 +466,7 @@ createLink(link: any) {
 		return buttonGroup;
 	}
 
-	initButtonActions() {
+	public initButtonActions() {
 		const buttonGroup = d3.select('#buttonGroup');
 
 		buttonGroup.selectAll('.button')
@@ -504,11 +508,11 @@ createLink(link: any) {
 			});
 	}
 
-	removeButtonGroup(node: any) {
+	public removeButtonGroup(node: any) {
 		node.select('#buttonGroup').remove();
 	}
 
-	updateSimulation() {
+	public updateSimulation() {
     const { links, nodes } = this.state;
     const nodesEl = d3.select('.nodes');
     const linksEl = d3.select('.links');
@@ -534,17 +538,17 @@ createLink(link: any) {
 	}
 
 	// Add new link
-	showAddLink() {
+	public showAddLink() {
 		this.setState({ showAddLinkModal: true });
 	}
 
-	handleAddLinkOk() {
+	public handleAddLinkOk() {
     const { newLink } = this.state;
     console.log(newLink);
   }
 
   // Add link
-  async addLink(source: number | string, target: number | string, relative: string) {
+  public async addLink(source: number | string, target: number | string, relative: string) {
     try {
       const link = {
         source,
@@ -562,7 +566,7 @@ createLink(link: any) {
     }
   }
 
-	handleAddLinkChange(value: any) {
+	public handleAddLinkChange(value: any) {
 		this.setState({
 			newLink: {
 				...this.state.newLink,
@@ -571,7 +575,7 @@ createLink(link: any) {
 		});
 	}
 
-	handleAddLinkCancel(visible: boolean) {
+	public handleAddLinkCancel(visible: boolean) {
 		this.setState({
 			showAddLinkModal: visible,
 			newLink: {
@@ -583,12 +587,12 @@ createLink(link: any) {
 		});
 	}
 
-	showAddNode() {
+	public showAddNode() {
 		this.setState({ showAddNodeModal: true });
 	}
 
   // Add node
-	async handleAddNodeOk(node: Node) {
+	public async handleAddNodeOk(node: Node) {
     const { nodes } = this.state;
 
     try {
@@ -607,12 +611,12 @@ createLink(link: any) {
     }
 	}
 
-	handleAddNodeCancel(visible: boolean) {
+	public handleAddNodeCancel(visible: boolean) {
 		this.setState({ showAddNodeModal: visible });
 	}
 
   // Update nodes list
-	async handleNodeOk(node: Node) {
+	public async handleNodeOk(node: Node) {
     const { selectedNode } = this.state;
 
     try {
@@ -646,12 +650,12 @@ createLink(link: any) {
     }
 	}
 
-	handleNodeCancel(visible: boolean) {
+	public handleNodeCancel(visible: boolean) {
 		this.setState({ showNodeModal: visible });
 	}
 
 	// Update links list
-	async handleLinkOk() {
+	public async handleLinkOk() {
     const { selectedLink } = this.state;
 
     try {
@@ -681,7 +685,7 @@ createLink(link: any) {
     }
 	}
 
-	handleLinkChange(value: any) {
+	public handleLinkChange(value: any) {
 		const { selectedLink } = this.state;
 		this.setState({
 			selectedLink: {
@@ -691,11 +695,11 @@ createLink(link: any) {
 		});
 	}
 
-	handleLinkCancel(visible: boolean) {
+	public handleLinkCancel(visible: boolean) {
 		this.setState({ showLinkModal: visible });
   }
 
-  async removeNode(node: any) {
+  public async removeNode(node: any) {
     const { nodes, links  } = this.state;
 
     try {
@@ -715,9 +719,10 @@ createLink(link: any) {
     }
 	}
 
-	render() {
+	public render() {
 		const { showAddNodeModal, showNodeModal, showLinkModal, showAddLinkModal,
-			selectedNode, selectedLink, scale, addNodeLoading, editNodeLoading } = this.state;
+      selectedNode, selectedLink, scale, addNodeLoading, editNodeLoading,
+      showDrawerTools } = this.state;
 
 		if (this.state.loading) {
 			return <Loading />;
@@ -765,6 +770,7 @@ createLink(link: any) {
 					onChange={(e: SyntheticEvent) => this.handleLinkChange(e)}
 					onCancel={(visible: boolean) => this.handleLinkCancel(visible)}
 				/>
+        <DrawerTools node={selectedNode} visible={showDrawerTools} />
 			</Content>
 		);
 	}

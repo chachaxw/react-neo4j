@@ -7,18 +7,9 @@ interface InternalProps {
 }
 
 const DrawerTools: FC<InternalProps> = (props) => {
-  const { node, visible, } = props;
+  const { node, visible } = props;
 
-  return (
-    <Drawer
-      width={240}
-      placement="right"
-      closable={false}
-      title={node.name}
-      visible={visible}
-    >
-    </Drawer>
-  );
-}
+  return <Drawer width={240} mask={false} placement="right" title={node.name} visible={visible}></Drawer>;
+};
 
 export default DrawerTools;

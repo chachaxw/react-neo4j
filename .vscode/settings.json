@@ -1,0 +1,11 @@
+{
+  "editor.formatOnSave": true,
+  "editor.tabSize": 2,
+  "prettier.singleQuote": true,
+  "prettier.printWidth": 120,
+  "prettier.trailingComma": "es5",
+  "prettier.arrowParens": "always",
+  "cSpell.words": [
+    "antd"
+  ]
+}

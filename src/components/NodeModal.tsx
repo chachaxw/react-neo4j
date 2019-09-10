@@ -13,16 +13,18 @@ interface Props extends FormComponentProps {
   onCancel: (visible: boolean) => void;
 }
 
- export const NodeModal: FC<Props> = (props) => {
+export const NodeModal: FC<Props> = (props) => {
   const { name, title, visible, loading, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
+  const buttonProps = { shape: 'round' };
 
   const handleOk = (e: any) => {
     e.preventDefault();
 
-    validateFields((err: any, values: any) => {
+    validateFields(async (err: any, values: any) => {
       if (!err) {
-        onOk(values);
+        await onOk(values);
+        resetFields();
       }
     });
   };
@@ -40,21 +42,19 @@ interface Props extends FormComponentProps {
       visible={visible}
       confirmLoading={loading}
       onCancel={handleCancel}
+      okButtonProps={buttonProps}
+      cancelButtonProps={buttonProps}
     >
       <Form>
         <Form.Item label="Node Name">
           {getFieldDecorator('name', {
             initialValue: name,
-            rules: [
-              { required: true, message: 'Please input node name!' },
-            ],
-          })(
-            <Input placeholder="Node name" />
-          )}
+            rules: [{ required: true, message: 'Please input node name!' }],
+          })(<Input placeholder="Node name" />)}
         </Form.Item>
       </Form>
     </Modal>
   );
-}
+};
 
 export default Form.create()(NodeModal);
