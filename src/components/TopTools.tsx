@@ -1,91 +1,75 @@
-import React, { Component } from 'react';
+import React, { FC, useEffect, useState } from 'react';
 import { Button, Form, Tooltip, InputNumber } from 'antd';
 import SearchBar from './SearchBar';
 
-interface InternalProps {
+interface Props {
   scale: number;
   showAddNode: () => void;
 }
 
-interface InternalState {
-  isFullScreen: boolean;
-}
+const TopTools: FC<Props> = (props) => {
+  const { scale, showAddNode } = props;
+  const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
-export default class TopTools extends Component<InternalProps, InternalState> {
-
-  constructor(props: InternalProps) {
-    super(props);
-    this.state = {
-      isFullScreen: false,
-    };
-  }
-
-  public componentDidMount() {
-    window.addEventListener('keydown', this.keyboardPress.bind(this));
-  }
-
-  public componentWillUnmount() {
-    window.removeEventListener('keydown', this.keyboardPress.bind(this));
-  }
-
-  keyboardPress(ev: KeyboardEvent) {
+  const keyboardPress = (ev: KeyboardEvent) => {
     // console.log(ev);
     if (ev.key === 'Escape') {
-      if (this.state.isFullScreen) {
-        this.setState({ isFullScreen: false });
+      if (isFullScreen) {
+        setIsFullScreen(false);
         document.exitFullscreen();
       }
     }
-  }
+  };
 
-  public setFullScreen() {
-    const { isFullScreen } = this.state;
+  const setFullScreen = () => {
     const body = document.getElementsByTagName('body')[0];
     if (!isFullScreen) {
-      this.setState({ isFullScreen: true });
+      setIsFullScreen(true);
       body.requestFullscreen();
     } else {
-      this.setState({ isFullScreen: false });
+      setIsFullScreen(false);
       document.exitFullscreen();
     }
-  }
+  };
 
-  render() {
-    const { isFullScreen } = this.state;
-    const { scale, showAddNode } = this.props;
-
-    return (
-      <Form layout="inline" className="visual-editor-tools">
-        <Form.Item>
-          <Tooltip title="Add Node" placement="bottom">
-            <Button onClick={showAddNode} shape="circle" icon="plus" type="primary" />
-          </Tooltip>
-        </Form.Item>
-        <Form.Item>
-          <Tooltip title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'} placement="bottom">
-            <Button
-              shape="circle"
-              type="primary"
-              icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
-              onClick={() => this.setFullScreen()}
-            />
-          </Tooltip>
-        </Form.Item>
-        <Form.Item>
-          <SearchBar />
-        </Form.Item>
-        <Form.Item>
-          <InputNumber
-            min={12.5}
-            max={500}
-            step={15}
-            value={scale}
-            defaultValue={100}
-            formatter={(value: number) => `${value}%`}
-            parser={(value: string) => value ? Number(value.replace('%', '')) : 100}
+  return (
+    <Form layout="inline" className="visual-editor-tools">
+      <Form.Item>
+        <Tooltip title="Add Node" placement="bottom">
+          <Button onClick={showAddNode} shape="circle" icon="plus" type="primary" />
+        </Tooltip>
+      </Form.Item>
+      <Form.Item>
+        <Tooltip title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'} placement="bottom">
+          <Button
+            shape="circle"
+            type="primary"
+            icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
+            onClick={setFullScreen}
           />
-        </Form.Item>
-      </Form>
-    );
-  }
-}
+        </Tooltip>
+      </Form.Item>
+      <Form.Item>
+        <Tooltip title="Set Node Color" placement="bottom">
+          <Button shape="circle" type="primary" icon="instagram" onClick={setFullScreen} />
+        </Tooltip>
+      </Form.Item>
+      <Form.Item>
+        <SearchBar />
+      </Form.Item>
+      <Form.Item>
+        <InputNumber
+          min={12.5}
+          max={500}
+          step={15}
+          value={scale}
+          defaultValue={100}
+          parser={(value?: string) => (value ? Number(value.replace('%', '')) : 100)}
+          formatter={(value?: number | string) => `${value ? value : 100}%`}
+        />
+      </Form.Item>
+    </Form>
+  );
+};
+
+export default TopTools;

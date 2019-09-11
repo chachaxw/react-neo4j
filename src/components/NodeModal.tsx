@@ -1,4 +1,5 @@
 import { Form, Input, Modal } from 'antd';
+import { ButtonProps } from 'antd/lib/button';
 import { FormComponentProps } from 'antd/lib/form';
 import React, { FC } from 'react';
 
@@ -16,7 +17,7 @@ interface Props extends FormComponentProps {
 export const NodeModal: FC<Props> = (props) => {
   const { name, title, visible, loading, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
-  const buttonProps = { shape: 'round' };
+  const buttonProps: ButtonProps = { shape: 'round' };
 
   const handleOk = (e: any) => {
     e.preventDefault();
@@ -45,7 +46,7 @@ export const NodeModal: FC<Props> = (props) => {
       okButtonProps={buttonProps}
       cancelButtonProps={buttonProps}
     >
-      <Form>
+      <Form onSubmit={handleOk}>
         <Form.Item label="Node Name">
           {getFieldDecorator('name', {
             initialValue: name,
@@ -57,4 +58,4 @@ export const NodeModal: FC<Props> = (props) => {
   );
 };
 
-export default Form.create()(NodeModal);
+export default Form.create<Props>()(NodeModal);

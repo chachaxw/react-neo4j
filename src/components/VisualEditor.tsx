@@ -759,7 +759,6 @@ class VisualEditor extends Component<any, InternalState> {
 					visible={showAddLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleAddLinkOk()}
-					onChange={(e: SyntheticEvent) => this.handleAddLinkChange(e)}
 					onCancel={(visible: boolean) => this.handleAddLinkCancel(visible)}
 				/>
 				<LinkModal
@@ -767,10 +766,13 @@ class VisualEditor extends Component<any, InternalState> {
 					visible={showLinkModal}
 					name={selectedLink.relative}
 					onOk={() => this.handleLinkOk()}
-					onChange={(e: SyntheticEvent) => this.handleLinkChange(e)}
 					onCancel={(visible: boolean) => this.handleLinkCancel(visible)}
 				/>
-        <DrawerTools node={selectedNode} visible={showDrawerTools} />
+        <DrawerTools 
+          node={selectedNode}
+          visible={showDrawerTools}
+          onClose={() => this.setState({ showDrawerTools: false })}
+        />
 			</Content>
 		);
 	}

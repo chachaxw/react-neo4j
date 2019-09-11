@@ -1,4 +1,5 @@
 import { Form, Input, Modal } from 'antd';
+import { ButtonProps } from 'antd/lib/button';
 import { FormComponentProps } from 'antd/lib/form';
 import React, { FC } from 'react';
 
@@ -15,7 +16,7 @@ interface Props extends FormComponentProps {
 export const LinkModal: FC<Props> = (props) => {
   const { name, title, visible, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
-  const buttonProps = { shape: 'round' };
+  const buttonProps: ButtonProps = { shape: 'round' };
 
   const handleOk = (e: any) => {
     e.preventDefault();
@@ -55,4 +56,4 @@ export const LinkModal: FC<Props> = (props) => {
   );
 };
 
-export default Form.create()(LinkModal);
+export default Form.create<Props>()(LinkModal);
