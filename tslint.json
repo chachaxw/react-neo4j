@@ -28,6 +28,7 @@
     "no-debugger": false,
     "jsx-alignment": false,
     "prefer-for-of": true,
+    "react-hooks-nesting": "error",
     "no-eval": true,
     "no-bitwise": false,
     "jsdoc-format": true,
@@ -64,7 +65,7 @@
       true,
       500
     ],
-    "max-classes-per-file":[
+    "max-classes-per-file": [
       true,
       1
     ],

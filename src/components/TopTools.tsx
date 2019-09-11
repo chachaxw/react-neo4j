@@ -11,8 +11,12 @@ const TopTools: FC<Props> = (props) => {
   const { scale, showAddNode } = props;
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
+  useEffect(() => {
+    window.addEventListener('keyup', keyboardPress);
+    return window.removeEventListener('keyup', keyboardPress);
+  }, []);
+
   const keyboardPress = (ev: KeyboardEvent) => {
-    // console.log(ev);
     if (ev.key === 'Escape') {
       if (isFullScreen) {
         setIsFullScreen(false);
@@ -40,6 +44,11 @@ const TopTools: FC<Props> = (props) => {
         </Tooltip>
       </Form.Item>
       <Form.Item>
+        <Tooltip title="Set Node Color" placement="bottom">
+          <Button shape="circle" type="primary" icon="instagram" onClick={setFullScreen} />
+        </Tooltip>
+      </Form.Item>
+      <Form.Item>
         <Tooltip title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'} placement="bottom">
           <Button
             shape="circle"
@@ -47,11 +56,6 @@ const TopTools: FC<Props> = (props) => {
             icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
             onClick={setFullScreen}
           />
-        </Tooltip>
-      </Form.Item>
-      <Form.Item>
-        <Tooltip title="Set Node Color" placement="bottom">
-          <Button shape="circle" type="primary" icon="instagram" onClick={setFullScreen} />
         </Tooltip>
       </Form.Item>
       <Form.Item>
