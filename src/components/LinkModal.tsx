@@ -6,7 +6,7 @@ import React, { FC } from 'react';
 import { Link } from './types';
 
 interface Props extends FormComponentProps {
-  name?: string;
+  data?: Link;
   title: string;
   visible: boolean;
   onOk: (link: Link) => void;
@@ -14,7 +14,7 @@ interface Props extends FormComponentProps {
 }
 
 export const LinkModal: FC<Props> = (props) => {
-  const { name, title, visible, onOk, onCancel, form } = props;
+  const { data, title, visible, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
   const buttonProps: ButtonProps = { shape: 'round' };
 
@@ -47,7 +47,7 @@ export const LinkModal: FC<Props> = (props) => {
       <Form>
         <Form.Item label="Link Name">
           {getFieldDecorator('name', {
-            initialValue: name,
+            initialValue: data ? data.name : '',
             rules: [{ required: true, message: 'Please input link name!' }],
           })(<Input placeholder="Link name" />)}
         </Form.Item>

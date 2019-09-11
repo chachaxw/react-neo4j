@@ -6,7 +6,7 @@ import React, { FC } from 'react';
 import { Node } from './types';
 
 interface Props extends FormComponentProps {
-  name?: string;
+  data?: Node;
   title: string;
   loading: boolean;
   visible: boolean;
@@ -15,7 +15,7 @@ interface Props extends FormComponentProps {
 }
 
 export const NodeModal: FC<Props> = (props) => {
-  const { name, title, visible, loading, onOk, onCancel, form } = props;
+  const { data, title, visible, loading, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
   const buttonProps: ButtonProps = { shape: 'round' };
 
@@ -49,7 +49,7 @@ export const NodeModal: FC<Props> = (props) => {
       <Form onSubmit={handleOk}>
         <Form.Item label="Node Name">
           {getFieldDecorator('name', {
-            initialValue: name,
+            initialValue: data ? data.name : '',
             rules: [{ required: true, message: 'Please input node name!' }],
           })(<Input placeholder="Node name" />)}
         </Form.Item>

@@ -1,12 +1,14 @@
 import { Col, Drawer, Form, InputNumber, Row } from 'antd';
-import React, { FC, SyntheticEvent } from 'react';
+import React, { FC } from 'react';
+
+import { Node } from './types';
 
 import styles from './DrawerTools.module.scss';
 
 const { Item } = Form;
 
 interface Props {
-  node: any;
+  node: Node | null;
   visible: boolean;
   onClose: () => void;
 }
@@ -18,21 +20,21 @@ const DrawerTools: FC<Props> = (props) => {
     <Drawer
       mask={false}
       placement="right"
-      title={node.name}
       visible={visible}
       onClose={onClose}
+      title={node && node.name}
       className={styles.drawerTools}
     >
       <Form>
         <Row gutter={12}>
           <Col span={12}>
             <Item label="fx">
-              <InputNumber disabled defaultValue={node.fx.toFixed(2)} placeholder="fx" />
+              <InputNumber disabled defaultValue={node ? node.fx.toFixed(2) : 0} placeholder="fx" />
             </Item>
           </Col>
           <Col span={12}>
             <Item label="fy">
-              <InputNumber disabled defaultValue={node.fy.toFixed(2)} placeholder="fy" />
+              <InputNumber disabled defaultValue={node ? node.fy.toFixed(2) : 0} placeholder="fy" />
             </Item>
           </Col>
         </Row>
