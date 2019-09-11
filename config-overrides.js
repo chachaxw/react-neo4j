@@ -6,7 +6,7 @@ const {
 } = require('customize-cra');
 const reactHotLoader = require('react-app-rewire-hot-loader');
 
-// Webpack 默认配置覆盖操作，慎改!!!
+// Webpack config overrides
 module.exports = override(
   fixBabelImports('import', {
     libraryName: 'antd',

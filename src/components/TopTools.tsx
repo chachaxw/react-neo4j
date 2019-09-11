@@ -1,5 +1,7 @@
-import React, { FC, useEffect, useState } from 'react';
-import { Button, Form, Tooltip, InputNumber } from 'antd';
+import { Button, Form, InputNumber, Tooltip } from 'antd';
+import React, { FC, useCallback, useEffect, useState } from 'react';
+import screenfull from 'screenfull';
+
 import SearchBar from './SearchBar';
 
 interface Props {
@@ -11,30 +13,33 @@ const TopTools: FC<Props> = (props) => {
   const { scale, showAddNode } = props;
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
-  useEffect(() => {
-    window.addEventListener('keyup', keyboardPress);
-    return window.removeEventListener('keyup', keyboardPress);
-  }, []);
-
-  const keyboardPress = (ev: KeyboardEvent) => {
-    if (ev.key === 'Escape') {
-      if (isFullScreen) {
-        setIsFullScreen(false);
-        document.exitFullscreen();
+  const keyboardPress = useCallback(
+    (ev: KeyboardEvent) => {
+      if (ev.key === 'Escape') {
+        if (isFullScreen) {
+          setIsFullScreen(false);
+          screenfull.exit();
+        }
       }
-    }
-  };
+    },
+    [isFullScreen]
+  );
 
   const setFullScreen = () => {
     const body = document.getElementsByTagName('body')[0];
     if (!isFullScreen) {
       setIsFullScreen(true);
-      body.requestFullscreen();
+      screenfull.request(body);
     } else {
       setIsFullScreen(false);
-      document.exitFullscreen();
+      screenfull.exit();
     }
   };
+
+  useEffect(() => {
+    window.addEventListener('keyup', keyboardPress);
+    return window.removeEventListener('keyup', keyboardPress);
+  }, [keyboardPress]);
 
   return (
     <Form layout="inline" className="visual-editor-tools">

@@ -34,7 +34,7 @@ interface InternalState {
 }
 
 class VisualEditor extends Component<any, InternalState> {
-	simulation: any = null;
+  private simulation: any = null;
 
 	constructor(props: any) {
 		super(props);
@@ -252,8 +252,11 @@ class VisualEditor extends Component<any, InternalState> {
 	public initLinkEvent(link: any) {
 		const self = this;
 
-		link.on('mouseenter', function() {
-			const link: any = d3.select(this);
+		link.on('mouseenter', function(d: any, i: number, n: any[]) {
+
+      console.log(n[i]);
+
+			const link: any = d3.select(n[i]);
 
 			if (!link._groups[0][0].classList.contains('selected')) {
 				link.select('.overlay')
@@ -262,8 +265,8 @@ class VisualEditor extends Component<any, InternalState> {
 			}
 		});
 
-		link.on('mouseleave', function() {
-			const link: any = d3.select(this);
+		link.on('mouseleave', function(d: any, i: number, n: any[]) {
+			const link: any = d3.select(n[i]);
 
 			if (!link._groups[0][0].classList.contains('selected')) {
 				link.select('.overlay')
@@ -271,8 +274,8 @@ class VisualEditor extends Component<any, InternalState> {
 			}
 		});
 
-		link.on('click', function(d: any) {
-			const link: any = d3.select(this);
+		link.on('click', function(d: any, i: number, n: any[]) {
+			const link: any = d3.select(n[i]);
 
 			if (link._groups[0][0].classList.contains('selected')) {
 				link.attr('class', 'link');
@@ -359,8 +362,8 @@ class VisualEditor extends Component<any, InternalState> {
 	public initNodeEvent(node: any) {
 		const self = this;
 
-		node.on('mouseenter', function() {
-			const node: any = d3.select(this);
+		node.on('mouseenter', function(d: any, i: number, n: any[]) {
+			const node: any = d3.select(n[i]);
 
 			if (node._groups[0][0].classList.contains('selected')) {
 				return;
@@ -372,8 +375,8 @@ class VisualEditor extends Component<any, InternalState> {
 				.attr('stroke-opacity', '0.5');
 		});
 
-		node.on('mouseleave', function() {
-			const node: any = d3.select(this);
+		node.on('mouseleave', function(d: any, i: number, n: any[]) {
+			const node: any = d3.select(n[i]);
 
 			if (node._groups[0][0].classList.contains('selected')) {
 				return;
@@ -383,8 +386,8 @@ class VisualEditor extends Component<any, InternalState> {
         .attr('stroke-width', 0);
 		});
 
-		node.on('click', function(d: any) {
-			const node: any = d3.select(this);
+		node.on('click', function(d: any, i: number, n: any[]) {
+			const node: any = d3.select(n[i]);
       const circle = node.select('circle');
 
       const selected = d3.selectAll('.node.selected');
@@ -575,7 +578,7 @@ class VisualEditor extends Component<any, InternalState> {
 		});
 	}
 
-	public handleAddLinkCancel(visible: boolean) {
+  public handleAddLinkCancel(visible: boolean) {
 		this.setState({
 			showAddLinkModal: visible,
 			newLink: {
