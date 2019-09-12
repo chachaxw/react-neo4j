@@ -3,7 +3,7 @@ import * as d3 from 'd3';
 import React, { Component, SyntheticEvent } from 'react';
 
 import { ApiService } from '../services/ApiService';
-import { sortBy } from '../utils/utils';
+import { ColorTheme, sortBy } from '../utils';
 import DrawerTools from './DrawerTools';
 import LinkModal from './LinkModal';
 import Loading from './Loading';
@@ -356,7 +356,7 @@ class VisualEditor extends Component<any, InternalState> {
     node
       .append('circle')
       .attr('r', 30)
-      .attr('fill', '#6ce4d8');
+      .attr('fill', ColorTheme.Cyan);
 
     node
       .append('text')
@@ -390,7 +390,7 @@ class VisualEditor extends Component<any, InternalState> {
 
       node
         .select('circle')
-        .attr('stroke', '#6ce4d8')
+        .attr('stroke', ColorTheme.Cyan)
         .attr('stroke-width', '12')
         .attr('stroke-opacity', '0.5');
     });
@@ -418,7 +418,7 @@ class VisualEditor extends Component<any, InternalState> {
         node.attr('class', 'node');
         this.removeButtonGroup(node);
       } else {
-        circle.attr('stroke-width', 12).attr('stroke', '#6ce4d8');
+        circle.attr('stroke-width', 12).attr('stroke', ColorTheme.Cyan);
         node.attr('class', 'node selected');
         this.addButtonGroup(node);
       }
