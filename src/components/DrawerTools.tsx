@@ -37,6 +37,16 @@ const DrawerTools: FC<Props> = (props) => {
               <InputNumber disabled defaultValue={node ? node.fy.toFixed(2) : 0} placeholder="fy" />
             </Item>
           </Col>
+          <Col span={12}>
+            <Item label="x">
+              <InputNumber disabled defaultValue={node ? node.x.toFixed(2) : 0} placeholder="x" />
+            </Item>
+          </Col>
+          <Col span={12}>
+            <Item label="y">
+              <InputNumber disabled defaultValue={node ? node.y.toFixed(2) : 0} placeholder="y" />
+            </Item>
+          </Col>
         </Row>
       </Form>
     </Drawer>

@@ -26,168 +26,170 @@ $searchHeight: 40px;
 $inputHeight: 32px;
 
 .search-bar {
-	display: flex;
-	align-items: center;
+  display: flex;
+  align-items: center;
   position: relative;
-	overflow: hidden;
-	height: $searchHeight;
+  overflow: hidden;
+  height: $searchHeight;
 
-	&.active {
-		&::before {
-			top: 7px;
-			bottom: 4px;
-			opacity: 0;
-		}
+  &.active {
+    &::before {
+      top: 7px;
+      bottom: 4px;
+      opacity: 0;
+    }
 
-		path {
-			stroke-dashoffset: -400;
-		}
+    path {
+      stroke-dashoffset: -400;
+    }
 
-		p {
-			pointer-events: all;
+    p {
+      pointer-events: all;
 
-			&::before,
-			&::after {
-				opacity: 1;
-			}
-		}
+      &::before,
+      &::after {
+        opacity: 1;
+      }
+    }
 
-		span {
-			transform: scale(0);
-			opacity: 0;
-		}
-	}
+    span {
+      transform: scale(0);
+      opacity: 0;
+    }
+  }
 
-	&.remove {
-		&::before {
-			transition: all 200ms linear 200ms, opacity 0ms linear 0ms;
-			top: $searchHeight;
-			bottom: 2px;
-			opacity: 1;
-		}
+  &.remove {
+    &::before {
+      transition: all 200ms linear 200ms, opacity 0ms linear 0ms;
+      top: $searchHeight;
+      bottom: 2px;
+      opacity: 1;
+    }
 
-		p {
-			&::before,
-			&::after {
-				transition: all 0ms;
-				opacity: 0;
-			}
-		}
+    p {
 
-		path {
-			stroke-dashoffset: -800;
-			transition-delay: 400ms;
-		}
+      &::before,
+      &::after {
+        transition: all 0ms;
+        opacity: 0;
+      }
+    }
 
-		span {
-			transform: scale(1);
-			opacity: 1;
-			transition-delay: 400ms;
-		}
+    path {
+      stroke-dashoffset: -800;
+      transition-delay: 400ms;
+    }
 
-		&.done {
-			&::before {
-				top: 0;
-				bottom: $searchHeight;
-				opacity: 1;
-				transition: none;
-			}
+    span {
+      transform: scale(1);
+      opacity: 1;
+      transition-delay: 400ms;
+    }
 
-			path {
-				stroke-dashoffset: 0;
-				stroke-dasharray: 400;
-				transition: none;
-			}
-		}
-	}
+    &.done {
+      &::before {
+        top: 0;
+        bottom: $searchHeight;
+        opacity: 1;
+        transition: none;
+      }
 
-	&::before {
-		content: '';
-		position: absolute;
-		left: 50%;
-		top: 4px;
-		transform: translateX(-1px);
-		width: 2px;
-		background: #438EF7;
-		bottom: $searchHeight;
-		border-radius: 16px;
-		opacity: 1;
-		transition: all 400ms ease-in-out 500ms, opacity 200ms linear 1000ms;
-	}
+      path {
+        stroke-dashoffset: 0;
+        stroke-dasharray: 400;
+        transition: none;
+      }
+    }
+  }
 
-	path {
-		stroke-dashoffset: 0;
-		stroke-dasharray: 400;
-		transition: all 500ms ease-in-out;
-	}
+  &::before {
+    content: '';
+    position: absolute;
+    left: 50%;
+    top: 4px;
+    transform: translateX(-1px);
+    width: 2px;
+    background: #065dab;
+    bottom: $searchHeight;
+    border-radius: 16px;
+    opacity: 1;
+    transition: all 400ms ease-in-out 500ms, opacity 200ms linear 1000ms;
+  }
 
-	span {
-		position: absolute;
-		left: 0;
-		height: $inputHeight;
-		line-height: $inputHeight;
-		width: 100%;
-		vertical-align: middle;
-		text-align: center;
-		font-size: 14px;
-		color: #438EF7;
-		pointer-events: none;
-		user-select: none;
-		transition: all 400ms ease-in-out;
-		opacity: 1;
-		transform: scale(1);
-	}
+  path {
+    stroke-dashoffset: 0;
+    stroke-dasharray: 400;
+    transition: all 500ms ease-in-out;
+  }
 
-	input,
-	p {
-	  position: absolute;
-	  height: $inputHeight;
-	  line-height: $inputHeight;
-	  width: 100%;
-	  vertical-align: middle;
-	  text-align: center;
-	  font-size: 14px;
-	}
+  span {
+    position: absolute;
+    left: 0;
+    height: $inputHeight;
+    line-height: $inputHeight;
+    width: 100%;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 14px;
+    color: #065dab;
+    pointer-events: none;
+    user-select: none;
+    transition: all 400ms ease-in-out;
+    opacity: 1;
+    transform: scale(1);
+  }
 
-	input {
-		border: 0;
-		outline: none;
-		color: transparent;
-		background-color: transparent;
-	}
+  input,
+  p {
+    position: absolute;
+    height: $inputHeight;
+    line-height: $inputHeight;
+    width: 100%;
+    vertical-align: middle;
+    text-align: center;
+    font-size: 14px;
+  }
 
-	p {
-		color: #438EF7;
-		pointer-events: none;
-		white-space: nowrap;
+  input {
+    border: 0;
+    outline: none;
+    color: transparent;
+    background-color: transparent;
+  }
 
-		&:after,
-		&:before {
-			content: '';
-			opacity: 0;
-			width: 2px;
-			height: 28px;
-			vertical-align: middle;
-			border-radius: 20px;
-			transition: all .2s ease-in-out;
-			transition-delay: 1000ms;
-			display: inline-block;
-		}
+  p {
+    color: #065dab;
+    pointer-events: none;
+    white-space: nowrap;
 
-		&:after {
-			position: relative;
-			left: -1px;
-			background: #438EF7;
-			animation: blinky 450ms linear infinite alternate;
-		}
-	}
+    &:after,
+    &:before {
+      content: '';
+      opacity: 0;
+      width: 2px;
+      height: 28px;
+      vertical-align: middle;
+      border-radius: 20px;
+      transition: all .2s ease-in-out;
+      transition-delay: 1000ms;
+      display: inline-block;
+    }
+
+    &:after {
+      position: relative;
+      left: -1px;
+      background: #065dab;
+      animation: blinky 450ms linear infinite alternate;
+    }
+  }
 }
 
 @keyframes blinky {
-	0% {
-		background: transparent;
-	}
-	100% {
-		background: #438EF7;
-	}
+  0% {
+    background: transparent;
+  }
+
+  100% {
+    background: #065dab;
+  }
 }

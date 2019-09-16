@@ -7,10 +7,11 @@ import SearchBar from './SearchBar';
 interface Props {
   scale: number;
   showAddNode: () => void;
+  setNodeColor?: (color: string) => void;
 }
 
 const TopTools: FC<Props> = (props) => {
-  const { scale, showAddNode } = props;
+  const { scale, showAddNode, setNodeColor } = props;
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   const keyboardPress = useCallback(
@@ -36,6 +37,8 @@ const TopTools: FC<Props> = (props) => {
     }
   };
 
+  const showColorPlatte = () => {};
+
   useEffect(() => {
     window.addEventListener('keyup', keyboardPress);
     return window.removeEventListener('keyup', keyboardPress);
@@ -50,7 +53,7 @@ const TopTools: FC<Props> = (props) => {
       </Form.Item>
       <Form.Item>
         <Tooltip title="Set Node Color" placement="bottom">
-          <Button shape="circle" type="primary" icon="instagram" onClick={setFullScreen} />
+          <Button shape="circle" type="primary" icon="instagram" onClick={showColorPlatte} />
         </Tooltip>
       </Form.Item>
       <Form.Item>

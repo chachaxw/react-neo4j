@@ -14,6 +14,7 @@ import './VisualEditor.scss';
 
 const { confirm } = Modal;
 const { Content } = Layout;
+const example = process.env.PUBLIC_URL + 'example.png';
 
 interface InternalState {
   loading: boolean;
@@ -112,6 +113,7 @@ class VisualEditor extends Component<any, InternalState> {
     this.onZoom(svg);
     this.addArrowMarker(svg);
 
+    const img = this.initImage(example, svg);
     const link = this.initLinks(links, svg);
     const node = this.initNodes(nodes, svg);
 
@@ -210,6 +212,17 @@ class VisualEditor extends Component<any, InternalState> {
     return links;
   }
 
+  public initImage(img: string, svg: any) {
+    const imgEl = svg.selectAll('image').data([0]);
+
+    imgEl.enter()
+      .append('svg:image')
+      .attr('xlink:href', img)
+      .attr('height', '100%')
+      .attr('x', 0)
+      .attr('y', 0);
+  }
+
   public initLinks(links: any, svg: any) {
     const link = svg
       .append('g')
@@ -234,6 +247,7 @@ class VisualEditor extends Component<any, InternalState> {
       .append('path')
       .attr('id', (d: any, i: number) => `linkPath${i}`)
       .attr('class', 'outline')
+      .attr('style', 'cursor: pointer')
       .attr('stroke', '#A5ABB6')
       .attr('fill', 'none')
       .attr('stroke-width', 1)
@@ -345,6 +359,7 @@ class VisualEditor extends Component<any, InternalState> {
       .enter()
       .append('g')
       .attr('class', 'node')
+      .attr('style', 'cursor: pointer')
       .call(
         d3
           .drag()
@@ -417,13 +432,15 @@ class VisualEditor extends Component<any, InternalState> {
         circle.attr('stroke-width', 0);
         node.attr('class', 'node');
         this.removeButtonGroup(node);
+        this.setState({ showDrawerTools: false });
       } else {
         circle.attr('stroke-width', 12).attr('stroke', ColorTheme.Cyan);
         node.attr('class', 'node selected');
         this.addButtonGroup(node);
+        this.setState({ showDrawerTools: true });
       }
 
-      this.setState({ selectedNode: d, showDrawerTools: true });
+      this.setState({ selectedNode: d });
     });
 
     node.on('dblclick', () => {

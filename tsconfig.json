@@ -36,6 +36,6 @@
     "jest",
     "tslint:latest",
     "tslint-config-prettier",
-    "config-overrides.js"
+    "src/serviceWorker.ts"
   ]
 }
