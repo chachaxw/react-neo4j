@@ -112,8 +112,8 @@ class VisualEditor extends Component<any, InternalState> {
 
     this.onZoom(svg);
     this.addArrowMarker(svg);
+    this.initImage(example, svg);
 
-    const img = this.initImage(example, svg);
     const link = this.initLinks(links, svg);
     const node = this.initNodes(nodes, svg);
 
@@ -131,7 +131,7 @@ class VisualEditor extends Component<any, InternalState> {
     this.simulation.alpha(1).restart();
   }
 
-  public handleTick(link: any, node: any) {
+  public handleTick(link: any, node: any, img?: any) {
     if (link) {
       link.selectAll('.outline').attr('d', (d: any) => this.linkArc(d));
 
@@ -213,14 +213,16 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public initImage(img: string, svg: any) {
-    const imgEl = svg.selectAll('image').data([0]);
+    const el = svg.selectAll('image').data([0]);
 
-    imgEl.enter()
+    el.enter()
       .append('svg:image')
       .attr('xlink:href', img)
       .attr('height', '100%')
       .attr('x', 0)
       .attr('y', 0);
+
+    return el;
   }
 
   public initLinks(links: any, svg: any) {
@@ -468,7 +470,7 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public addButtonGroup(node: any) {
-    const data = [1, 1, 1, 1, 1];
+    const data = [1, 1, 1, 1];
     const buttonGroup = node.append('g').attr('id', 'buttonGroup');
 
     const pieData = d3.pie()(data);
@@ -488,7 +490,7 @@ class VisualEditor extends Component<any, InternalState> {
       .append('path')
       .attr('class', (d: any, i: number) => `button action-${i}`)
       .attr('d', (d: any) => arcButton(d))
-      .attr('fill', '#D2D5D9')
+      .attr('fill', '#c7c5ba')
       .style('cursor', 'pointer')
       .attr('stroke', '#f1f4f9')
       .attr('stroke-width', 2)
@@ -506,7 +508,7 @@ class VisualEditor extends Component<any, InternalState> {
       .attr('pointer-events', 'none')
       .attr('font-size', 11)
       .text((d: any, i: number) => {
-        const actions = ['Edit', 'Expand', 'Add', 'Link', 'Delete'];
+        const actions = ['Edit', 'Add', 'Link', 'Delete'];
         return actions[i];
       });
 
@@ -526,7 +528,7 @@ class VisualEditor extends Component<any, InternalState> {
       })
       .on('mouseleave', function() {
         const button: any = d3.select(this);
-        button.attr('fill', '#D2D5D9');
+        button.attr('fill', '#c7c5ba');
       });
 
     buttonGroup.select('.button.action-0').on('click', (d) => {

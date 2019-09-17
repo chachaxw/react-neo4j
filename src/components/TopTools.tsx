@@ -74,6 +74,7 @@ const TopTools: FC<Props> = (props) => {
           min={12.5}
           max={500}
           step={15}
+          disabled
           value={scale}
           defaultValue={100}
           parser={(value?: string) => (value ? Number(value.replace('%', '')) : 100)}
