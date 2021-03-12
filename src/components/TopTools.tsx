@@ -1,8 +1,8 @@
-import { Button, Form, InputNumber, Tooltip } from 'antd';
-import React, { FC, useCallback, useEffect, useState } from 'react';
-import screenfull from 'screenfull';
+import { Button, Form, InputNumber, Tooltip } from "antd";
+import React, { FC, useCallback, useEffect, useState } from "react";
+import screenfull from "screenfull";
 
-import SearchBar from './SearchBar';
+import SearchBar from "./SearchBar";
 
 interface Props {
   scale: number;
@@ -16,7 +16,7 @@ const TopTools: FC<Props> = (props) => {
 
   const keyboardPress = useCallback(
     (ev: KeyboardEvent) => {
-      if (ev.key === 'Escape') {
+      if (ev.key === "Escape") {
         if (isFullScreen) {
           setIsFullScreen(false);
           screenfull.exit();
@@ -27,7 +27,7 @@ const TopTools: FC<Props> = (props) => {
   );
 
   const setFullScreen = () => {
-    const body = document.getElementsByTagName('body')[0];
+    const body = document.getElementsByTagName("body")[0];
     if (!isFullScreen) {
       setIsFullScreen(true);
       screenfull.request(body);
@@ -40,8 +40,8 @@ const TopTools: FC<Props> = (props) => {
   const showColorPlatte = () => {};
 
   useEffect(() => {
-    window.addEventListener('keyup', keyboardPress);
-    return window.removeEventListener('keyup', keyboardPress);
+    window.addEventListener("keyup", keyboardPress);
+    return window.removeEventListener("keyup", keyboardPress);
   }, [keyboardPress]);
 
   return (
@@ -57,11 +57,11 @@ const TopTools: FC<Props> = (props) => {
         </Tooltip>
       </Form.Item>
       <Form.Item>
-        <Tooltip title={isFullScreen ? 'Exit Full Screen' : 'Full Screen'} placement="bottom">
+        <Tooltip title={isFullScreen ? "Exit Full Screen" : "Full Screen"} placement="bottom">
           <Button
             shape="circle"
             type="primary"
-            icon={isFullScreen ? 'fullscreen-exit' : 'fullscreen'}
+            icon={isFullScreen ? "fullscreen-exit" : "fullscreen"}
             onClick={setFullScreen}
           />
         </Tooltip>
@@ -77,7 +77,7 @@ const TopTools: FC<Props> = (props) => {
           disabled
           value={scale}
           defaultValue={100}
-          parser={(value?: string) => (value ? Number(value.replace('%', '')) : 100)}
+          parser={(value?: string) => (value ? Number(value.replace("%", "")) : 100)}
           formatter={(value?: number | string) => `${value ? value : 100}%`}
         />
       </Form.Item>

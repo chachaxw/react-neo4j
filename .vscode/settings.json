@@ -6,6 +6,7 @@
   "prettier.trailingComma": "es5",
   "prettier.arrowParens": "always",
   "cSpell.words": [
-    "antd"
+    "antd",
+    "screenfull"
   ]
 }
