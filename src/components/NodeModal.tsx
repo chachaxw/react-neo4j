@@ -1,9 +1,9 @@
-import { Form, Input, Modal } from 'antd';
-import { ButtonProps } from 'antd/lib/button';
-import { FormComponentProps } from 'antd/lib/form';
-import React, { FC } from 'react';
+import { Form, Input, Modal } from "antd";
+import { ButtonProps } from "antd/lib/button";
+import { FormComponentProps } from "antd/lib/form";
+import React, { FC } from "react";
 
-import { Node } from './types';
+import { Node } from "./types";
 
 interface Props extends FormComponentProps {
   data?: Node;
@@ -17,7 +17,7 @@ interface Props extends FormComponentProps {
 export const NodeModal: FC<Props> = (props) => {
   const { data, title, visible, loading, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
-  const buttonProps: ButtonProps = { shape: 'round' };
+  const buttonProps: ButtonProps = { shape: "round" };
 
   const handleOk = (e: any) => {
     e.preventDefault();
@@ -48,9 +48,9 @@ export const NodeModal: FC<Props> = (props) => {
     >
       <Form onSubmit={handleOk}>
         <Form.Item label="Node Name">
-          {getFieldDecorator('name', {
-            initialValue: data ? data.name : '',
-            rules: [{ required: true, message: 'Please input node name!' }],
+          {getFieldDecorator("name", {
+            initialValue: data ? data.name : "",
+            rules: [{ required: true, message: "Please input node name!" }],
           })(<Input placeholder="Node name" />)}
         </Form.Item>
       </Form>

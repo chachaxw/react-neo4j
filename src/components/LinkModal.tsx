@@ -1,9 +1,9 @@
-import { Form, Input, Modal } from 'antd';
-import { ButtonProps } from 'antd/lib/button';
-import { FormComponentProps } from 'antd/lib/form';
-import React, { FC } from 'react';
+import { Form, Input, Modal } from "antd";
+import { ButtonProps } from "antd/lib/button";
+import { FormComponentProps } from "antd/lib/form";
+import React, { FC } from "react";
 
-import { Link } from './types';
+import { Link } from "./types";
 
 interface Props extends FormComponentProps {
   data?: Link;
@@ -16,7 +16,7 @@ interface Props extends FormComponentProps {
 export const LinkModal: FC<Props> = (props) => {
   const { data, title, visible, onOk, onCancel, form } = props;
   const { getFieldDecorator, validateFields, resetFields } = form;
-  const buttonProps: ButtonProps = { shape: 'round' };
+  const buttonProps: ButtonProps = { shape: "round" };
 
   const handleOk = (e: any) => {
     e.preventDefault();
@@ -46,9 +46,9 @@ export const LinkModal: FC<Props> = (props) => {
     >
       <Form>
         <Form.Item label="Link Name">
-          {getFieldDecorator('name', {
-            initialValue: data ? data.name : '',
-            rules: [{ required: true, message: 'Please input link name!' }],
+          {getFieldDecorator("name", {
+            initialValue: data ? data.name || data.relative : "",
+            rules: [{ required: true, message: "Please input link name!" }],
           })(<Input placeholder="Link name" />)}
         </Form.Item>
       </Form>

@@ -1,20 +1,19 @@
-import { Layout, message, Modal } from 'antd';
-import * as d3 from 'd3';
-import React, { Component, SyntheticEvent } from 'react';
+import { Layout, message, Modal } from "antd";
+import * as d3 from "d3";
+import React, { Component, SyntheticEvent } from "react";
 
-import { ApiService } from '../services/ApiService';
-import { ColorTheme, sortBy } from '../utils';
-import DrawerTools from './DrawerTools';
-import LinkModal from './LinkModal';
-import Loading from './Loading';
-import NodeModal from './NodeModal';
-import TopTools from './TopTools';
-import { Link, Node } from './types';
-import './VisualEditor.scss';
+import { ApiService } from "../services/ApiService";
+import { ColorTheme, sortBy } from "../utils";
+import DrawerTools from "./DrawerTools";
+import LinkModal from "./LinkModal";
+import Loading from "./Loading";
+import NodeModal from "./NodeModal";
+import TopTools from "./TopTools";
+import { Link, Node } from "./types";
+import "./VisualEditor.scss";
 
 const { confirm } = Modal;
 const { Content } = Layout;
-const example = process.env.PUBLIC_URL + 'example.png';
 
 interface InternalState {
   loading: boolean;
@@ -53,13 +52,13 @@ class VisualEditor extends Component<any, InternalState> {
       showLinkModal: false,
       newNode: {
         id: 0,
-        name: '',
+        name: "",
       },
       newLink: {
         id: 0,
         source: null,
         target: null,
-        relative: 'LINK_TO',
+        relative: "LINK_TO",
       },
       nodes: [],
       links: [],
@@ -72,7 +71,7 @@ class VisualEditor extends Component<any, InternalState> {
     const { data: links } = await ApiService.fetchLinks();
 
     this.setState({ loading: false, nodes, links }, () => {
-      const el = document.getElementById('Neo4jContainer');
+      const el = document.getElementById("Neo4jContainer");
       this.initSimulation(el!, nodes, this.formatLinks(links));
     });
   }
@@ -88,36 +87,25 @@ class VisualEditor extends Component<any, InternalState> {
     this.simulation = d3
       .forceSimulation(nodes)
       .force(
-        'link',
+        "link",
         d3
           .forceLink(links)
           .distance(160)
           .id((d: any) => d.id)
       )
-      .force(
-        'charge',
-        d3
-          .forceManyBody()
-          .distanceMax(300)
-          .strength(-800)
-      )
-      .force('collide', d3.forceCollide().strength(-60))
-      .force('center', d3.forceCenter(width / 2, height / 2));
+      .force("charge", d3.forceManyBody().distanceMax(300).strength(-800))
+      .force("collide", d3.forceCollide().strength(-60))
+      .force("center", d3.forceCenter(width / 2, height / 2));
 
-    const svg = d3
-      .select('#Neo4jContainer')
-      .append('svg')
-      .attr('width', '100%')
-      .attr('height', '100%');
+    const svg = d3.select("#Neo4jContainer").append("svg").attr("width", "100%").attr("height", "100%");
 
     this.onZoom(svg);
     this.addArrowMarker(svg);
-    this.initImage(example, svg);
 
     const link = this.initLinks(links, svg);
     const node = this.initNodes(nodes, svg);
 
-    this.simulation.on('tick', () => this.handleTick(link, node));
+    this.simulation.on("tick", () => this.handleTick(link, node));
     this.simulation.alpha(1).restart();
   }
 
@@ -133,12 +121,12 @@ class VisualEditor extends Component<any, InternalState> {
 
   public handleTick(link: any, node: any, img?: any) {
     if (link) {
-      link.selectAll('.outline').attr('d', (d: any) => this.linkArc(d));
+      link.selectAll(".outline").attr("d", (d: any) => this.linkArc(d));
 
-      link.selectAll('.overlay').attr('d', (d: any) => this.linkArc(d));
+      link.selectAll(".overlay").attr("d", (d: any) => this.linkArc(d));
     }
 
-    node.attr('transform', (d: any) => `translate(${d.x}, ${d.y})`);
+    node.attr("transform", (d: any) => `translate(${d.x}, ${d.y})`);
   }
 
   public onDragStarted(d: any) {
@@ -163,7 +151,7 @@ class VisualEditor extends Component<any, InternalState> {
   public onZoom(svg: any) {
     // 鼠标滚轮缩放
     svg.call(
-      d3.zoom().on('zoom', () => {
+      d3.zoom().on("zoom", () => {
         const { transform } = d3.event;
         const scale = Number((transform.k * 100).toFixed());
 
@@ -172,10 +160,10 @@ class VisualEditor extends Component<any, InternalState> {
         }
 
         this.setState({ scale });
-        d3.selectAll('#Neo4jContainer > svg > g').attr('transform', transform);
+        d3.selectAll("#Neo4jContainer > svg > g").attr("transform", transform);
       })
     );
-    svg.on('dblclick.zoom', null); // 静止双击缩放
+    svg.on("dblclick.zoom", null); // 静止双击缩放
   }
 
   public formatLinks(links: any[]) {
@@ -200,10 +188,7 @@ class VisualEditor extends Component<any, InternalState> {
       });
     });
 
-    const maxSame = links
-      .concat()
-      .sort(sortBy('sameTotal'))
-      .slice(-1)[0].sameTotal;
+    const maxSame = links.concat().sort(sortBy("sameTotal")).slice(-1)[0].sameTotal;
 
     links.forEach((link) => {
       link.maxSameHalf = Math.round(maxSame / 2);
@@ -213,23 +198,18 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public initImage(img: string, svg: any) {
-    const el = svg.selectAll('image').data([0]);
+    const el = svg.selectAll("image").data([0]);
 
-    el.enter()
-      .append('svg:image')
-      .attr('xlink:href', img)
-      .attr('height', '100%')
-      .attr('x', 0)
-      .attr('y', 0);
+    el.enter().append("svg:image").attr("xlink:href", img).attr("height", "100%").attr("x", 0).attr("y", 0);
 
     return el;
   }
 
   public initLinks(links: any, svg: any) {
     const link = svg
-      .append('g')
-      .attr('class', 'layer links')
-      .selectAll('path.outline')
+      .append("g")
+      .attr("class", "layer links")
+      .selectAll("path.outline")
       .data(links, (d: any) => d);
 
     return this.createLink(link);
@@ -240,44 +220,41 @@ class VisualEditor extends Component<any, InternalState> {
       return;
     }
 
-    link = link
-      .enter()
-      .append('g')
-      .attr('class', 'link');
+    link = link.enter().append("g").attr("class", "link");
 
     link
-      .append('path')
-      .attr('id', (d: any, i: number) => `linkPath${i}`)
-      .attr('class', 'outline')
-      .attr('style', 'cursor: pointer')
-      .attr('stroke', '#A5ABB6')
-      .attr('fill', 'none')
-      .attr('stroke-width', 1)
-      .attr('marker-end', 'url(#ArrowMarker)');
+      .append("path")
+      .attr("id", (d: any, i: number) => `linkPath${i}`)
+      .attr("class", "outline")
+      .attr("style", "cursor: pointer")
+      .attr("stroke", "#A5ABB6")
+      .attr("fill", "none")
+      .attr("stroke-width", 1)
+      .attr("marker-end", "url(#ArrowMarker)");
 
     link
-      .append('text')
-      .attr('class', 'link-text')
-      .attr('fill', '#A5ABB6')
-      .append('textPath')
-      .attr('pointer-events', 'none')
-      .attr('href', (d: any, i: number) => `#linkPath${i}`)
-      .attr('startOffset', '50%')
-      .attr('font-size', 12)
-      .attr('text-anchor', 'middle')
+      .append("text")
+      .attr("class", "link-text")
+      .attr("fill", "#A5ABB6")
+      .append("textPath")
+      .attr("pointer-events", "none")
+      .attr("href", (d: any, i: number) => `#linkPath${i}`)
+      .attr("startOffset", "50%")
+      .attr("font-size", 12)
+      .attr("text-anchor", "middle")
       .text((d: any) => {
-        if (d.relative !== '') {
+        if (d.relative !== "") {
           return d.relative;
         }
       });
 
     link
-      .append('path')
-      .attr('class', 'overlay')
-      .attr('fill', 'none')
-      .attr('stroke-opacity', '0.5')
-      .attr('stroke-width', '16')
-      .style('opacity', '0');
+      .append("path")
+      .attr("class", "overlay")
+      .attr("fill", "none")
+      .attr("stroke-opacity", "0.5")
+      .attr("stroke-width", "16")
+      .style("opacity", "0");
 
     // init link event
     this.initLinkEvent(link);
@@ -286,43 +263,37 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public initLinkEvent(link: any) {
-    link.on('mouseenter', (d: any, i: number, n: any[]) => {
+    link.on("mouseenter", (d: any, i: number, n: any[]) => {
       const link: any = d3.select(n[i]);
 
-      if (!link._groups[0][0].classList.contains('selected')) {
-        link
-          .select('.overlay')
-          .attr('stroke', '#68bdf6')
-          .style('opacity', 1);
+      if (!link._groups[0][0].classList.contains("selected")) {
+        link.select(".overlay").attr("stroke", "#68bdf6").style("opacity", 1);
       }
     });
 
-    link.on('mouseleave', (d: any, i: number, n: any[]) => {
+    link.on("mouseleave", (d: any, i: number, n: any[]) => {
       const link: any = d3.select(n[i]);
 
-      if (!link._groups[0][0].classList.contains('selected')) {
-        link.select('.overlay').style('opacity', 0);
+      if (!link._groups[0][0].classList.contains("selected")) {
+        link.select(".overlay").style("opacity", 0);
       }
     });
 
-    link.on('click', (d: any, i: number, n: any[]) => {
+    link.on("click", (d: any, i: number, n: any[]) => {
       const link: any = d3.select(n[i]);
 
-      if (link._groups[0][0].classList.contains('selected')) {
-        link.attr('class', 'link');
-        link.select('.overlay').style('opacity', 0);
+      if (link._groups[0][0].classList.contains("selected")) {
+        link.attr("class", "link");
+        link.select(".overlay").style("opacity", 0);
       } else {
-        link.attr('class', 'link selected');
-        link
-          .select('.overlay')
-          .attr('stroke', '#FDCC59')
-          .style('opacity', 1);
+        link.attr("class", "link selected");
+        link.select(".overlay").attr("stroke", "#FDCC59").style("opacity", 1);
       }
 
       this.setState({ selectedLink: d });
     });
 
-    link.on('dblclick', () => {
+    link.on("dblclick", () => {
       this.setState({ showLinkModal: true });
     });
   }
@@ -348,9 +319,9 @@ class VisualEditor extends Component<any, InternalState> {
 
   public initNodes(nodes: any, svg: any) {
     const node = svg
-      .append('g')
-      .attr('class', 'layer nodes')
-      .selectAll('.node')
+      .append("g")
+      .attr("class", "layer nodes")
+      .selectAll(".node")
       .data(nodes, (d: any) => d);
 
     return this.createNode(node);
@@ -359,37 +330,34 @@ class VisualEditor extends Component<any, InternalState> {
   public createNode(node: any) {
     node = node
       .enter()
-      .append('g')
-      .attr('class', 'node')
-      .attr('style', 'cursor: pointer')
+      .append("g")
+      .attr("class", "node")
+      .attr("style", "cursor: pointer")
       .call(
         d3
           .drag()
-          .on('start', (d) => this.onDragStarted(d))
-          .on('drag', (d) => this.onDragged(d))
-          .on('end', (d) => this.onDragEnded(d))
+          .on("start", (d) => this.onDragStarted(d))
+          .on("drag", (d) => this.onDragged(d))
+          .on("end", (d) => this.onDragEnded(d))
       );
 
-    node
-      .append('circle')
-      .attr('r', 30)
-      .attr('fill', ColorTheme.Cyan);
+    node.append("circle").attr("r", 30).attr("fill", ColorTheme.Cyan);
 
     node
-      .append('text')
-      .attr('dy', '5')
-      .attr('fill', '#ffffff')
-      .attr('pointer-events', 'none')
-      .attr('font-size', '12px')
-      .attr('text-anchor', 'middle')
+      .append("text")
+      .attr("dy", "5")
+      .attr("fill", "#ffffff")
+      .attr("pointer-events", "none")
+      .attr("font-size", "12px")
+      .attr("text-anchor", "middle")
       .text((d: any) => {
         if (d.name && d.name.length > 4) {
-          return d.name.slice(0, 4) + '...';
+          return d.name.slice(0, 4) + "...";
         }
-        return d.name ? d.name : '';
+        return d.name ? d.name : "";
       });
 
-    node.append('title').text((d: any) => d.name);
+    node.append("title").text((d: any) => d.name);
 
     // init node event
     this.initNodeEvent(node);
@@ -398,46 +366,42 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public initNodeEvent(node: any) {
-    node.on('mouseenter', (d: any, i: number, n: any[]) => {
+    node.on("mouseenter", (d: any, i: number, n: any[]) => {
       const node: any = d3.select(n[i]);
 
-      if (node._groups[0][0].classList.contains('selected')) {
+      if (node._groups[0][0].classList.contains("selected")) {
         return;
       }
 
-      node
-        .select('circle')
-        .attr('stroke', ColorTheme.Cyan)
-        .attr('stroke-width', '12')
-        .attr('stroke-opacity', '0.5');
+      node.select("circle").attr("stroke", ColorTheme.Cyan).attr("stroke-width", "12").attr("stroke-opacity", "0.5");
     });
 
-    node.on('mouseleave', (d: any, i: number, n: any[]) => {
+    node.on("mouseleave", (d: any, i: number, n: any[]) => {
       const node: any = d3.select(n[i]);
 
-      if (node._groups[0][0].classList.contains('selected')) {
+      if (node._groups[0][0].classList.contains("selected")) {
         return;
       }
 
-      node.select('circle').attr('stroke-width', 0);
+      node.select("circle").attr("stroke-width", 0);
     });
 
-    node.on('click', (d: any, i: number, n: any[]) => {
+    node.on("click", (d: any, i: number, n: any[]) => {
       const node: any = d3.select(n[i]);
-      const circle = node.select('circle');
+      const circle = node.select("circle");
 
-      const selected = d3.selectAll('.node.selected');
+      const selected = d3.selectAll(".node.selected");
 
       this.removeButtonGroup(selected);
 
-      if (node._groups[0][0].classList.contains('selected')) {
-        circle.attr('stroke-width', 0);
-        node.attr('class', 'node');
+      if (node._groups[0][0].classList.contains("selected")) {
+        circle.attr("stroke-width", 0);
+        node.attr("class", "node");
         this.removeButtonGroup(node);
         this.setState({ showDrawerTools: false });
       } else {
-        circle.attr('stroke-width', 12).attr('stroke', ColorTheme.Cyan);
-        node.attr('class', 'node selected');
+        circle.attr("stroke-width", 12).attr("stroke", ColorTheme.Cyan);
+        node.attr("class", "node selected");
         this.addButtonGroup(node);
         this.setState({ showDrawerTools: true });
       }
@@ -445,70 +409,61 @@ class VisualEditor extends Component<any, InternalState> {
       this.setState({ selectedNode: d });
     });
 
-    node.on('dblclick', () => {
+    node.on("dblclick", () => {
       this.setState({ showNodeModal: true });
     });
   }
 
   public addArrowMarker(svg: any) {
     const arrow = svg
-      .append('marker')
-      .attr('id', 'ArrowMarker')
-      .attr('markerUnits', 'strokeWidth')
-      .attr('markerWidth', '14')
-      .attr('markerHeight', '14')
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', '30')
-      .attr('refY', '0')
-      .attr('orient', 'auto');
-    const arrowPath = 'M0,-4 L10,0 L0,4';
+      .append("marker")
+      .attr("id", "ArrowMarker")
+      .attr("markerUnits", "strokeWidth")
+      .attr("markerWidth", "14")
+      .attr("markerHeight", "14")
+      .attr("viewBox", "0 -5 10 10")
+      .attr("refX", "30")
+      .attr("refY", "0")
+      .attr("orient", "auto");
+    const arrowPath = "M0,-4 L10,0 L0,4";
 
-    arrow
-      .append('path')
-      .attr('d', arrowPath)
-      .attr('fill', '#A5ABB6');
+    arrow.append("path").attr("d", arrowPath).attr("fill", "#A5ABB6");
   }
 
   public addButtonGroup(node: any) {
     const data = [1, 1, 1, 1];
-    const buttonGroup = node.append('g').attr('id', 'buttonGroup');
+    const buttonGroup = node.append("g").attr("id", "buttonGroup");
 
     const pieData = d3.pie()(data);
-    const arcButton = d3
-      .arc()
-      .innerRadius(32)
-      .outerRadius(64);
-    const arcText = d3
-      .arc()
-      .innerRadius(32)
-      .outerRadius(60);
+    const arcButton = d3.arc().innerRadius(32).outerRadius(64);
+    const arcText = d3.arc().innerRadius(32).outerRadius(60);
 
     buttonGroup
-      .selectAll('.button')
+      .selectAll(".button")
       .data(pieData)
       .enter()
-      .append('path')
-      .attr('class', (d: any, i: number) => `button action-${i}`)
-      .attr('d', (d: any) => arcButton(d))
-      .attr('fill', '#c7c5ba')
-      .style('cursor', 'pointer')
-      .attr('stroke', '#f1f4f9')
-      .attr('stroke-width', 2)
-      .attr('stroke-opacity', 0.7);
+      .append("path")
+      .attr("class", (d: any, i: number) => `button action-${i}`)
+      .attr("d", (d: any) => arcButton(d))
+      .attr("fill", "#c7c5ba")
+      .style("cursor", "pointer")
+      .attr("stroke", "#f1f4f9")
+      .attr("stroke-width", 2)
+      .attr("stroke-opacity", 0.7);
 
     buttonGroup
-      .selectAll('.text')
+      .selectAll(".text")
       .data(pieData)
       .enter()
-      .append('text')
-      .attr('class', 'text')
-      .attr('transform', (d: any) => `translate(${arcText.centroid(d)})`)
-      .attr('text-anchor', 'middle')
-      .attr('fill', '#fff')
-      .attr('pointer-events', 'none')
-      .attr('font-size', 11)
+      .append("text")
+      .attr("class", "text")
+      .attr("transform", (d: any) => `translate(${arcText.centroid(d)})`)
+      .attr("text-anchor", "middle")
+      .attr("fill", "#fff")
+      .attr("pointer-events", "none")
+      .attr("font-size", 11)
       .text((d: any, i: number) => {
-        const actions = ['Edit', 'Add', 'Link', 'Delete'];
+        const actions = ["Edit", "Add", "Link", "Delete"];
         return actions[i];
       });
 
@@ -518,35 +473,31 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public initButtonActions() {
-    const buttonGroup = d3.select('#buttonGroup');
+    const buttonGroup = d3.select("#buttonGroup");
 
     buttonGroup
-      .selectAll('.button')
-      .on('mouseenter', function() {
+      .selectAll(".button")
+      .on("mouseenter", function () {
         const button: any = d3.select(this);
-        button.attr('fill', '#CACACA');
+        button.attr("fill", "#CACACA");
       })
-      .on('mouseleave', function() {
+      .on("mouseleave", function () {
         const button: any = d3.select(this);
-        button.attr('fill', '#c7c5ba');
+        button.attr("fill", "#c7c5ba");
       });
 
-    buttonGroup.select('.button.action-0').on('click', (d) => {
+    buttonGroup.select(".button.action-0").on("click", (d) => {
       this.setState({
         selectedNode: d,
         showNodeModal: true,
       });
     });
 
-    buttonGroup.select('.button.action-1').on('click', (d) => {
-      // console.log('Expand', d);
-    });
+    buttonGroup.select(".button.action-1").on("click", (d) => this.showAddNode());
 
-    buttonGroup.select('.button.action-2').on('click', (d) => this.showAddNode());
+    buttonGroup.select(".button.action-2").on("click", (d) => this.showAddLink());
 
-    buttonGroup.select('.button.action-3').on('click', (d) => this.showAddLink());
-
-    buttonGroup.select('.button.action-4').on('click', (d: any) => {
+    buttonGroup.select(".button.action-3").on("click", (d: any) => {
       confirm({
         centered: true,
         title: `Do you want to delete ${d.name}?`,
@@ -556,28 +507,28 @@ class VisualEditor extends Component<any, InternalState> {
   }
 
   public removeButtonGroup(node: any) {
-    node.select('#buttonGroup').remove();
+    node.select("#buttonGroup").remove();
   }
 
   public updateSimulation() {
     const { links, nodes } = this.state;
-    const nodesEl = d3.select('.nodes');
-    const linksEl = d3.select('.links');
+    const nodesEl = d3.select(".nodes");
+    const linksEl = d3.select(".links");
 
     // Update node
-    let node = nodesEl.selectAll('.node').data(nodes, (d: any) => d);
+    let node = nodesEl.selectAll(".node").data(nodes, (d: any) => d);
     node.exit().remove();
     const nodeEnter = this.createNode(node);
     node = nodeEnter.merge(node);
 
     // Update link
-    let link = linksEl.selectAll('.link').data(links, (d: any) => d);
+    let link = linksEl.selectAll(".link").data(links, (d: any) => d);
     link.exit().remove();
     const linkEnter = this.createLink(link);
     link = linkEnter.merge(link);
 
-    this.simulation.nodes(nodes).on('tick', () => this.handleTick(link, node));
-    this.simulation.force('link').links(links);
+    this.simulation.nodes(nodes).on("tick", () => this.handleTick(link, node));
+    this.simulation.force("link").links(links);
     this.simulation.alpha(1).restart();
   }
 
@@ -586,8 +537,9 @@ class VisualEditor extends Component<any, InternalState> {
     this.setState({ showAddLinkModal: true });
   }
 
+  // TODO: need to do
   public handleAddLinkOk() {
-    const { newLink } = this.state;
+    // const { newLink } = this.state;
     // console.log(newLink);
   }
 
@@ -604,7 +556,7 @@ class VisualEditor extends Component<any, InternalState> {
 
       this.setState({ links: this.formatLinks(links) }, () => this.updateSimulation());
       this.handleAddLinkCancel(false);
-      message.success('Add Link Success');
+      message.success("Add Link Success");
     } catch (err) {
       message.error(err.message);
     }
@@ -626,7 +578,7 @@ class VisualEditor extends Component<any, InternalState> {
         id: 0,
         source: null,
         target: null,
-        relative: '',
+        relative: "",
       },
     });
   }
@@ -651,7 +603,7 @@ class VisualEditor extends Component<any, InternalState> {
         () => this.updateSimulation()
       );
       this.handleAddNodeCancel(false);
-      message.success('Add Node Success');
+      message.success("Add Node Success");
     } catch (err) {
       this.setState({ addNodeLoading: false });
       message.error(err.message);
@@ -693,7 +645,7 @@ class VisualEditor extends Component<any, InternalState> {
       );
       this.handleNodeCancel(false);
 
-      message.success('Update Node Success');
+      message.success("Update Node Success");
     } catch (err) {
       this.setState({ editNodeLoading: false });
       message.error(err.message);
@@ -729,7 +681,7 @@ class VisualEditor extends Component<any, InternalState> {
 
       this.setState({ links }, () => this.updateSimulation());
       this.handleLinkCancel(false);
-      message.success('Update Link Success');
+      message.success("Update Link Success");
     } catch (err) {
       message.error(err.message);
     }
@@ -766,7 +718,7 @@ class VisualEditor extends Component<any, InternalState> {
         },
         () => this.updateSimulation()
       );
-      message.success('Remove Node Success');
+      message.success("Remove Node Success");
     } catch (err) {
       message.error(err.message);
     }

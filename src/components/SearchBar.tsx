@@ -1,5 +1,5 @@
-import classNames from 'classnames';
-import React, { Component, FormEvent } from 'react';
+import classNames from "classnames";
+import React, { Component, FormEvent } from "react";
 
 interface InternalState {
   trigger: boolean | null;
@@ -9,7 +9,7 @@ interface InternalState {
 export default class SearchBar extends Component<any, InternalState> {
   public readonly state = {
     trigger: null,
-    value: '',
+    value: "",
   };
 
   public handleClick() {
@@ -19,21 +19,21 @@ export default class SearchBar extends Component<any, InternalState> {
   }
 
   public handleBlur() {
-    const search = document.querySelector('.search-bar');
-    this.setState({ trigger: false, value: '' });
+    const search = document.querySelector(".search-bar");
+    this.setState({ trigger: false, value: "" });
 
     if (!search) {
       return;
     }
 
     setTimeout(() => {
-      search.classList.add('done');
+      search.classList.add("done");
 
       setTimeout(() => {
         setTimeout(() => {
-          search.classList.remove('done');
+          search.classList.remove("done");
           this.setState({ trigger: null });
-          search.classList.remove('remove');
+          search.classList.remove("remove");
         }, 100);
       }, 100);
     }, 800);
@@ -41,7 +41,7 @@ export default class SearchBar extends Component<any, InternalState> {
 
   public render() {
     const { trigger, value } = this.state;
-    const cls = classNames('search-bar', { active: trigger, remove: trigger === false });
+    const cls = classNames("search-bar", { active: trigger, remove: trigger === false });
 
     return (
       <div className={cls} onClick={() => this.handleClick()}>
@@ -52,7 +52,7 @@ export default class SearchBar extends Component<any, InternalState> {
             stroke="#065dab"
             strokeWidth="4"
             strokeMiterlimit="10"
-            style={{ transform: 'scale(0.36)' }}
+            style={{ transform: "scale(0.36)" }}
             d="M177.75 85.99h133.5c23.334 0 42.25-18.916 42.25-42.25C352.944 20.528 333.967 2 310.748 2H177.75"
           />
           <path
@@ -61,7 +61,7 @@ export default class SearchBar extends Component<any, InternalState> {
             stroke="#065dab"
             strokeWidth="4"
             strokeMiterlimit="10"
-            style={{ transform: 'scale(0.36)' }}
+            style={{ transform: "scale(0.36)" }}
             d="M177.75 85.99H44.25C20.916 85.99 2 67.074 2 43.74 2.556 20.528 21.533 2 44.752 2H177.75"
           />
         </svg>
