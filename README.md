@@ -27,6 +27,10 @@ Your app is ready to be deployed!
 
 See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
+### `npm mock`
+
+Run mock server and please access `http://localhost:3031` to test api if it's ready
+
 ### `npm run eject`
 
 **Note: this is a one-way operation. Once you `eject`, you can’t go back!**
@@ -45,4 +49,19 @@ To learn React, check out the [React documentation](https://reactjs.org/).
 
 ## Screen Shot
 
-[React Neo4j](!https://github.com/chachaxw/neo4j-react/blob/master/public/screen-shot.png)
+![React Neo4j With D3](/public/screen-shot.png)
+👇
+![React Neo4j With D3](/public/screen-shot1.png)
+👇
+![React Neo4j With D3](/public/screen-shot2.png)
+👇
+![React Neo4j With D3](/public/screen-shot3.png)
+👇
+![React Neo4j With D3](/public/screen-shot4.png)
+
+## References
+
+- [d3-force](https://github.com/d3/d3-force)
+- [Force-Directed Graph](https://observablehq.com/@d3/force-directed-graph)
+- [Disjoint Force-Directed Graph](https://observablehq.com/@d3/disjoint-force-directed-graph)
+- [Using D3 with React and TypeScript](https://spin.atomicobject.com/2017/07/20/d3-react-typescript/)

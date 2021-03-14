@@ -1,0 +1,83 @@
+{
+  "nodes": [
+    {
+      "id": 0,
+      "name": "工具🔧"
+    },
+    {
+      "id": 1,
+      "name": "💻"
+    },
+    {
+      "id": 5,
+      "name": "手机📱"
+    },
+    {
+      "id": 6,
+      "name": "钱💰"
+    },
+    {
+      "id": 7,
+      "name": "汽车🚗"
+    },
+    {
+      "id": 8,
+      "name": "单车🚴‍♀️"
+    },
+    {
+      "id": 9,
+      "name": "手表⌚️"
+    }
+  ],
+  "links": [
+    {
+      "id": 0,
+      "value": 1,
+      "source": 0,
+      "target": 1,
+      "relative": "LINK_TO"
+    },
+    {
+      "id": 1,
+      "value": 1,
+      "source": 1,
+      "target": 0,
+      "relative": "LINK_TO"
+    },
+    {
+      "id": 5,
+      "value": 2,
+      "source": 0,
+      "target": 5,
+      "relative": "REFERENCE"
+    },
+    {
+      "id": 6,
+      "value": 2,
+      "source": 0,
+      "target": 6,
+      "relative": "LINK_TO"
+    },
+    {
+      "id": 7,
+      "value": 2,
+      "source": 0,
+      "target": 7,
+      "relative": "REFERENCE"
+    },
+    {
+      "id": 8,
+      "value": 2,
+      "source": 0,
+      "target": 8,
+      "relative": "REFERENCE"
+    },
+    {
+      "id": 9,
+      "value": 2,
+      "source": 0,
+      "target": 9,
+      "relative": "REFERENCE"
+    }
+  ]
+}

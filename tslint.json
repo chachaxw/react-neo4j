@@ -1,0 +1,90 @@
+{
+  "extends": [
+    "tslint:recommended",
+    "tslint-react",
+    "tslint-react-hooks"
+  ],
+  "rulesDirectory": [
+    "node_modules/tslint-lines-between-class-members"
+  ],
+  "rules": {
+    "quotemark": [
+      true,
+      "single",
+      "jsx-double"
+    ],
+    "curly": true,
+    "lines-between-class-members": true,
+    "object-literal-sort-keys": false,
+    "ordered-imports": true,
+    "member-ordering": false,
+    "variable-name": false,
+    "jsx-no-multiline-js": false,
+    "jsx-no-lambda": false,
+    "jsx-boolean-value": false,
+    "interface-name": false,
+    "jsx-no-string-ref": false,
+    "no-shadowed-variable": false,
+    "no-debugger": false,
+    "jsx-alignment": false,
+    "prefer-for-of": true,
+    "react-hooks-nesting": "error",
+    "no-eval": true,
+    "no-bitwise": false,
+    "jsdoc-format": true,
+    "triple-equals": true,
+    "no-empty-interface": true,
+    "no-unnecessary-initializer": true,
+    "no-conditional-assignment": true,
+    "array-type": [
+      true,
+      "array"
+    ],
+    "no-unused-expression": [
+      true,
+      "allow-fast-null-checks"
+    ],
+    "no-empty": [
+      false,
+      "allow-empty-catch"
+    ],
+    "no-trailing-whitespace": [
+      true,
+      "ignore-comments",
+      "ignore-jsdoc"
+    ],
+    "comment-format": [
+      true,
+      "check-space"
+    ],
+    "max-line-length": [
+      true,
+      120
+    ],
+    "max-file-line-count": [
+      true,
+      500
+    ],
+    "max-classes-per-file": [
+      true,
+      1
+    ],
+    "one-variable-per-declaration": [
+      true,
+      "ignore-for-loop"
+    ],
+    "trailing-comma": [
+      true,
+      {
+        "singleline": "never",
+        "multiline": {
+          "objects": "always",
+          "arrays": "always",
+          "functions": "ignore",
+          "typeLiterals": "ignore"
+        },
+        "esSpecCompliant": true
+      }
+    ]
+  }
+}

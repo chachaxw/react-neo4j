@@ -1,18 +1,16 @@
 import { Layout } from 'antd';
-import React, { Component } from 'react';
-import VisualEditor from './components/VisualEditor';
+import React, { FC } from 'react';
+import { hot } from 'react-hot-loader';
 
 import './App.css';
-import 'antd/dist/antd.css';
+import VisualEditor from './components/VisualEditor';
 
-class App extends Component {
-  render() {
-    return (
-      <Layout className="App">
-        <VisualEditor />
-      </Layout>
-    );
-  }
-}
+const App: FC = () => {
+  return (
+    <Layout className="App">
+      <VisualEditor />
+    </Layout>
+  );
+};
 
-export default App;
+export default process.env.NODE_ENV === 'development' ? hot(module)(App) : App;
