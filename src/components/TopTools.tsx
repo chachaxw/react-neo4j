@@ -11,7 +11,7 @@ interface Props {
 }
 
 const TopTools: FC<Props> = (props) => {
-  const { scale, showAddNode, setNodeColor } = props;
+  const { scale, showAddNode } = props;
   const [isFullScreen, setIsFullScreen] = useState<boolean>(false);
 
   const keyboardPress = useCallback(
@@ -37,6 +37,7 @@ const TopTools: FC<Props> = (props) => {
     }
   };
 
+  // TODO:
   const showColorPlatte = () => {};
 
   useEffect(() => {

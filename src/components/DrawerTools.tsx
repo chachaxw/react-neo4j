@@ -16,8 +16,6 @@ interface Props {
 const DrawerTools: FC<Props> = (props) => {
   const { node, visible, onClose } = props;
 
-  console.log("节点", node);
-
   return (
     <Drawer
       mask={false}
